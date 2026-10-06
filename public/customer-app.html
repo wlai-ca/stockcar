@@ -92,6 +92,13 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
 .stop.now .t{color:var(--red)}
 .pill{font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:4px 8px;border-radius:99px;background:var(--red);color:#fff}
 .pill.done{background:var(--line);color:var(--ink-soft)}
+.pill.near{background:#E7F6EE;color:var(--green)}
+.stop.cruise{background:repeating-linear-gradient(135deg,#fafaf7 0 8px,#f4f2ec 8px 16px)}
+.stop.cruise .n{color:var(--ink-soft)}
+.stop.you{background:#FDECEA}
+.routenote{font-size:11.5px;color:var(--ink-soft);line-height:1.45;margin:8px 4px 0}
+.stop.flash{animation:rflash 1.2s ease}
+@keyframes rflash{0%{background:#FFE9A8}100%{background:inherit}}
 
 .optin{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:13px 14px;display:flex;gap:12px;align-items:center;margin-top:10px}
 .optin .tx{flex:1;font-size:12px;line-height:1.4;color:var(--ink-soft)}
@@ -221,7 +228,7 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
     <div class="sms" id="sms" onclick="hideSms()">
       <div class="ic">💬</div>
       <div style="flex:1"><div class="h"><b>Stockcar</b><span>now</span></div>
-      <p>🏁 Stockcar is in Westridge until 8 PM. Order now and it's at your door in about 10 min.</p></div>
+      <p>🏁 Stockcar is passing through Westridge in about 6 min on its way to a delivery. Order now and it stops at your door.</p></div>
     </div>
 
     <div class="statusbar"><span>7:12</span><span>📶 🔋</span></div>
@@ -235,11 +242,11 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
       <!-- HOME -->
       <div class="view active" id="view-home">
         <div class="live">
-          <div class="livetag"><span class="dot"></span>Out now · until 11 PM</div>
-          <h2>In Westridge right now</h2>
-          <div class="sub">Parked on Westridge Dr until 8:00 PM, then Downtown.</div>
+          <div class="livetag"><span class="dot"></span>On the road · until 11 PM</div>
+          <h2 id="liveH">Heading to Westridge next</h2>
+          <div class="sub" id="liveSub"></div>
           <div class="livestats">
-            <div class="ls"><b>~9 min</b><span>To your door</span></div>
+            <div class="ls"><b id="liveEta">~8 min</b><span>To your door</span></div>
             <div class="ls"><b>$3</b><span>Flat delivery</span></div>
             <div class="ls"><b id="onBoard">0</b><span>Items on board</span></div>
           </div>
@@ -250,10 +257,11 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
           <div class="term">Same prices as the gas station</div>
         </div>
 
-        <div class="sect"><h3>Tonight's route</h3><span style="font-size:11px;color:var(--ink-soft);font-weight:600">Mon–Thu</span></div>
+        <div class="sect"><h3>Where the car is heading</h3><span style="font-size:11px;color:var(--green);font-weight:700">● LIVE</span></div>
         <div class="route" id="routeList"></div>
+        <p class="routenote">The route follows tonight's orders, so it changes every time someone orders. Times are live estimates. We never promise where the car will be hours from now.</p>
         <div class="optin">
-          <div class="tx"><b>Text me when it's in my area</b>One text when the car reaches your neighbourhood. No spam, unsubscribe anytime.</div>
+          <div class="tx"><b>Text me when it's passing near me</b>One text when the car's route comes through your area, so you can grab something on its way by. No spam, unsubscribe anytime.</div>
           <button class="switch on" id="optSwitch" onclick="toggleOpt()"></button>
         </div>
 
@@ -288,7 +296,7 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
           <button class="cardpay" id="cardpay" onclick="pay('card')">Pay with card</button>
           <p class="fine">Demo checkout. No real payment is taken.<br>Taxes and deposits are estimated for the demo.</p>
         </div>
-        <div class="empty" id="cartEmpty"><div class="e">🛒</div><p>Nothing in here yet.<br>The car's in Westridge until 8. Grab something before it moves on.</p><button onclick="go('menu')">See what's on board</button></div>
+        <div class="empty" id="cartEmpty"><div class="e">🛒</div><p>Nothing in here yet.<br>The car passes near you soon. Order now and it stops at your door on the way.</p><button onclick="go('menu')">See what's on board</button></div>
       </div>
 
       <!-- TRACK -->
@@ -375,20 +383,55 @@ const COMBOS={
   spicy:{n:"Spicy Challenge combo",e:"🌶️",p:15.99,items:{4:1,5:1,9:1,13:1}}
 };
 const RATE={z:0,g:.05,gp:.12};
-const ROUTE=[
- {t:"3:00–4:30",n:"Downtown",d:"After-school run",s:"done"},
- {t:"4:30–6:00",n:"Glendale",d:"",s:"done"},
- {t:"6:00–8:00",n:"Westridge",d:"Parked on Westridge Dr",s:"now"},
- {t:"8:00–9:30",n:"Downtown",d:"",s:""},
- {t:"9:30–11:00",n:"Fox Mountain",d:"Last call",s:""},
+/* live route: the plan is built from orders waiting, nearest first. It changes as orders come in. */
+const ME="Westridge";
+let PLAN=[
+ {a:"Downtown",k:"now",d:"Dropping off an order",eta:0},
+ {a:"Westridge",k:"del",eta:6},
+ {a:"Glendale",k:"del",eta:15},
 ];
+const AREAS=["Glendale","Fox Mountain","Downtown","Lakeview","Westridge"];
+let tick=0;
 let cart={}, combos=[], cat="All", optIn=true, orderNo=1001, live=null;
 const byId=id=>P.find(x=>x.id==id);
 const $=id=>document.getElementById(id);
 
-function renderRoute(){
-  $("routeList").innerHTML=ROUTE.map(r=>`<div class="stop ${r.s==='now'?'now':''}"><div class="t">${r.t}</div><div class="n">${r.n}${r.d?`<small>${r.d}</small>`:""}</div>${r.s==='now'?'<span class="pill">NOW</span>':r.s==='done'?'<span class="pill done">DONE</span>':''}</div>`).join("");
+function yourEta(){
+  const you=PLAN.find(s=>s.k==="you"); if(you) return you.eta;
+  const near=PLAN.find(s=>s.a===ME&&s.k==="del"); if(near) return near.eta+2;
+  return PLAN[PLAN.length-1].eta+7;
 }
+function renderRoute(flashIdx){
+  const label=s=>s.k==="now"?(s.d||"Delivering now"):s.k==="you"?"Your order":"Delivery";
+  $("routeList").innerHTML=PLAN.map((s,i)=>`<div class="stop ${s.k==='now'?'now':''} ${s.k==='you'?'you':''} ${i===flashIdx?'flash':''}"><div class="t">${s.k==='now'?'NOW':'~'+s.eta+' min'}</div><div class="n">${s.a}<small>${label(s)}</small></div>${s.k==='now'?'<span class="pill">HERE</span>':s.k==='you'?'<span class="pill">YOU</span>':s.a===ME?'<span class="pill near">NEAR YOU</span>':''}</div>`).join("")+
+   `<div class="stop cruise"><div class="t">Then</div><div class="n">Cruising Downtown<small>If no new orders, it waits where it's busiest</small></div></div>`;
+  const nxt=PLAN[1]||PLAN[0], dels=PLAN.filter(s=>s.k!=="now").length, eta=yourEta();
+  $("liveH").textContent="Heading to "+nxt.a+" next";
+  const passing=PLAN.some(s=>s.a===ME&&s.k!=="now");
+  $("liveSub").textContent=`${dels} stop${dels===1?'':'s'} planned. `+(PLAN.some(s=>s.k==="you")?"Your order is on the route.":passing?"It passes near you on the way, so ordering now is quick.":"Order and your stop gets added to the route.");
+  $("liveEta").textContent="~"+eta+" min";
+}
+/* demo: the route shifts as the night goes on */
+function routeTick(){
+  tick++;
+  PLAN.forEach(s=>{if(s.k!=="now") s.eta=Math.max(1,s.eta-1)});
+  let flash=-1;
+  if(PLAN[1]&&PLAN[1].eta<=1&&PLAN[1].k!=="you"){
+    PLAN.shift(); PLAN[0].k="now"; PLAN[0].d="Dropping off an order"; PLAN[0].eta=0;
+  }
+  if(tick%3===0||PLAN.length<3){
+    const area=AREAS[tick%AREAS.length];
+    const at=PLAN.map(s=>s.a).lastIndexOf(area);
+    if(at>0){ /* same area as a stop already planned: slot it in right after, while the car's there */
+      const e=PLAN[at].eta+2; PLAN.splice(at+1,0,{a:area,k:"del",eta:e}); for(let i=at+2;i<PLAN.length;i++) PLAN[i].eta+=3; flash=at+1;
+    }else{
+      PLAN.push({a:area,k:"del",eta:PLAN[PLAN.length-1].eta+6}); flash=PLAN.length-1;
+    }
+    toast("Route updated: new order in "+area);
+  }
+  renderRoute(flash);
+}
+setInterval(routeTick,15000);
 function card(p){
   const q=cart[p.id]||0;
   const badges=(p.age?'<span class="badge b-age">16+</span>':p.cold?'<span class="badge b-cold">❄ COLD</span>':'')+(p.st<=4?`<span class="badge b-low">${p.st} left</span>`:'');
@@ -446,6 +489,7 @@ function renderCart(){
 function pay(method){
   const t=totals(), n=count();
   live={no:orderNo++,n,total:t.total,method,stage:0};
+  { const e=yourEta(); const near=PLAN.findIndex(s=>s.a===ME&&s.k==="del"); const at=near>=0?near+1:PLAN.length; PLAN=PLAN.filter(s=>s.k!=="you"); PLAN.splice(Math.min(at,PLAN.length),0,{a:ME,k:"you",eta:e}); renderRoute(); }
   $("sheetText").innerHTML=`Order <b>#${live.no}</b> is in. The driver is pulling it off the car now.<br>Paid with ${method}.`;
   $("sheet").classList.add("show");
   P.forEach(p=>{if(cart[p.id]) p.st-=cart[p.id]});
@@ -455,7 +499,7 @@ function pay(method){
 function closeSheet(){$("sheet").classList.remove("show"); go("track"); runTrack()}
 
 /* tracking */
-const STEPS=[["Order received","Paid · sent to the driver"],["Driver accepted","Packing it from the car"],["On the way","Coming from Westridge Dr"],["Delivered","Handed off at your front door"]];
+const STEPS=[["Order received","Paid · sent to the driver"],["Driver accepted","Packing it from the car"],["On the way","Your stop is next on the route"],["Delivered","Handed off at your front door"]];
 let trackTimers=[], carT=null;
 function renderTrack(){
   $("trackEmpty").style.display=live?"none":"block"; $("trackLive").style.display=live?"block":"none";
@@ -473,13 +517,13 @@ function runTrack(){
   trackTimers.push(setTimeout(()=>{live.stage=2;renderTrack();
     let f=0; carT=setInterval(()=>{f=Math.min(1,f+.01); const pt=path.getPointAtLength(L*f);
       car.setAttribute("transform",`translate(${pt.x} ${pt.y})`); setEta(Math.max(1,Math.ceil(8*(1-f))));
-      if(f>=1){clearInterval(carT); live.stage=3; renderTrack(); $("etaLabel").textContent="Delivered"; $("etaVal").textContent="✓"; toast("Delivered. Check your front door")}
+      if(f>=1){clearInterval(carT); live.stage=3; renderTrack(); PLAN=PLAN.filter(s=>s.k!=="you"); renderRoute(); $("etaLabel").textContent="Delivered"; $("etaVal").textContent="✓"; toast("Delivered. Check your front door")}
     },120)},5000));
 }
 function setEta(m){$("etaLabel").textContent="Estimated arrival"; $("etaVal").textContent=m+" min"}
 
 /* misc */
-function toggleOpt(){optIn=!optIn; $("optSwitch").classList.toggle("on",optIn); toast(optIn?"You'll get a text when it's nearby":"Area texts off")}
+function toggleOpt(){optIn=!optIn; $("optSwitch").classList.toggle("on",optIn); toast(optIn?"You'll get a text when the car passes near you":"Area texts off")}
 function go(v){
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
   $("view-"+v).classList.add("active");

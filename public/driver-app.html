@@ -119,6 +119,8 @@ body{font-family:var(--body);color:var(--ink);background:#0A0B0D;background-imag
 .zone{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:8px}
 .zone.now{border-color:var(--green)}
 .zone.past{opacity:.55}
+.areahead{display:flex;justify-content:space-between;align-items:baseline;margin:12px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--flag)}
+.areahead small{font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--soft);font-weight:600}
 .ztop{display:flex;align-items:center;gap:10px}
 .zt{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--flag);min-width:78px}
 .zn{flex:1}
@@ -226,7 +228,8 @@ body{font-family:var(--body);color:var(--ink);background:#0A0B0D;background-imag
 
       <!-- ROUTE -->
       <div class="view" id="view-route">
-        <div class="sect" style="margin-top:6px"><h3>Tonight's route</h3><span>Customers see this</span></div>
+        <div class="sect" style="margin-top:6px"><h3>Live route</h3><span>Built from your orders</span></div>
+        <p class="legend">The app puts your stops in order: it finishes one area before moving to the next, and slots new orders in along the way. Customers see where you're heading, never a fixed timetable.</p>
         <div id="zones"></div>
         <div class="sect"><h3>House rules</h3></div>
         <div class="rules">
@@ -309,13 +312,13 @@ let done=[
  {no:1036,name:"Olivia",addr:"Westridge",items:{23:1,15:2,10:1},fee:3,t:"6:20"},
  {no:1037,name:"Ethan",addr:"Westridge",items:{1:2,13:3,12:1,6:1},fee:0,t:"6:51"},
 ];
-let current={no:1038,name:"Jordan",addr:"48 Westridge Dr",km:1.6,eta:4,items:{4:1,13:2,10:2,19:1},fee:3,stage:"pack",ticked:{}};
-let queue=[{no:1039,name:"Chloe",addr:"Westridge Pl",km:0.9,eta:3,items:{7:2,15:1,3:1},fee:3}];
+let current={no:1038,name:"Jordan",addr:"48 Westridge Dr",area:"Westridge",km:1.6,eta:4,items:{4:1,13:2,10:2,19:1},fee:3,stage:"pack",ticked:{}};
+let queue=[{no:1039,name:"Chloe",addr:"Westridge Pl",area:"Westridge",km:0.9,eta:3,items:{7:2,15:1,3:1},fee:3}];
 const POOL=[
- {name:"Ben",addr:"Westridge Cres",km:1.2,eta:4,items:{5:1,13:1,7:1},fee:3},
- {name:"Maya",addr:"Westridge Dr",km:0.7,eta:2,items:{1:1,4:1,13:2,12:2},fee:3},
- {name:"Jack",addr:"Lakeview Ave",km:2.1,eta:6,items:{18:2,2:1},fee:3},
- {name:"Sofia",addr:"Westridge Pl",km:1.0,eta:3,items:{10:3,6:1,15:2},fee:3},
+ {name:"Ben",area:"Westridge",addr:"Westridge Cres",km:1.2,eta:4,items:{5:1,13:1,7:1},fee:3},
+ {name:"Maya",area:"Glendale",addr:"Glendale Dr",km:0.7,eta:2,items:{1:1,4:1,13:2,12:2},fee:3},
+ {name:"Jack",area:"Lakeview",addr:"Lakeview Ave",km:2.1,eta:6,items:{18:2,2:1},fee:3},
+ {name:"Sofia",area:"Fox Mountain",addr:"Fox Mountain Rd",km:1.0,eta:3,items:{10:3,6:1,15:2},fee:3},
 ];
 let nextNo=1040, auto=true, onShift=true, kmDriven=31, shiftStart=15; /* 3:00 PM */
 const $=id=>document.getElementById(id);
@@ -377,9 +380,10 @@ let clockMin=19*60+12;
 function clockLabel(){const h=Math.floor(clockMin/60)%12||12, m=String(clockMin%60).padStart(2,"0"); return h+":"+m}
 function incoming(){
   if(!onShift) return;
-  const base=POOL[Math.floor(Math.random()*POOL.length)];
+  const base=POOL[nextNo%POOL.length];
   const o={...base,items:{...base.items},no:nextNo++,pending:!auto};
-  if(!current&&auto){current={...o,stage:"pack",ticked:{}}}else{queue.push(o)}
+  if(!current&&auto){current={...o,stage:"pack",ticked:{}}}else{routeInsert(o)}
+  renderZones();
   toast(auto?`🔊 "New order. ${nItems(o)} items, ${o.addr}."`:"🔔 New order: tap Accept");
   renderNow();
 }
@@ -406,19 +410,40 @@ function restock(){
 }
 
 /* ---------- ROUTE ---------- */
-const ZONES=[
- {t:"3:00–4:30",n:"Downtown",d:"After-school run",s:"past",opt:22,sent:"3:02"},
- {t:"4:30–6:00",n:"Glendale",d:"",s:"past",opt:14,sent:"4:31"},
- {t:"6:00–8:00",n:"Westridge",d:"Parked on Westridge Dr",s:"now",opt:31,sent:null},
- {t:"8:00–9:30",n:"Downtown",d:"",s:"",opt:22,sent:null},
- {t:"9:30–11:00",n:"Fox Mountain",d:"Last call",s:"",opt:9,sent:null},
-];
-function renderZones(){
-  $("zones").innerHTML=ZONES.map((z,i)=>`<div class="zone ${z.s}"><div class="ztop"><div class="zt">${z.t}</div><div class="zn"><b>${z.n}</b><span>${z.d||"&nbsp;"} · ${z.opt} people opted in</span></div>${z.s==='now'?'<span class="stagepill" style="background:rgba(61,220,132,.14);color:var(--green)">NOW</span>':''}</div>
-    ${z.s==='now'?`<div class="preview"><small>THEY'LL GET THIS TEXT</small>🏁 Stockcar is in ${z.n} until ${z.t.split("–")[1]} PM. Order now and it's at your door in about 10 min.</div>`:''}
-    ${z.s==='past'?`<button class="zbtn sent">✓ Area text sent ${z.sent} PM</button>`:z.sent?`<button class="zbtn sent">✓ Sent to ${z.opt} people at ${z.sent} PM</button>`:z.s==='now'?`<button class="zbtn" onclick="sendZone(${i})">💬 Text the ${z.opt} people in ${z.n}</button>`:`<button class="zbtn" style="opacity:.5;cursor:default">Text unlocks when you arrive</button>`}</div>`).join("");
+/* The route is built from the orders: finish one area, then move to the next. */
+const OPT={Westridge:31,Downtown:22,Glendale:14,"Fox Mountain":9,Lakeview:12};
+const areaOf=o=>o.area||"Westridge";
+let autoText=true;
+let TEXTLOG=[{area:"Downtown",n:22,t:"6:02"},{area:"Glendale",n:14,t:"6:34"}];
+function routeStops(){
+  const stops=[]; let t=0, prev=null;
+  if(current){t=current.stage==="handoff"?0:current.eta; stops.push({o:current,eta:t,now:true}); prev=areaOf(current)}
+  queue.forEach(o=>{t+=(areaOf(o)===prev?3:8); stops.push({o,eta:t}); prev=areaOf(o)});
+  return stops;
 }
-function sendZone(i){ZONES[i].sent=clockLabel(); toast(`Texted ${ZONES[i].opt} people in ${ZONES[i].n}`); renderZones(); setTimeout(incoming,5000)}
+function routeInsert(o){ /* slot a new order in after the last stop in the same area */
+  const a=areaOf(o); let at=-1; queue.forEach((q,i)=>{if(areaOf(q)===a) at=i});
+  if(at>=0) queue.splice(at+1,0,o); else if(current&&areaOf(current)===a) queue.unshift(o); else queue.push(o);
+}
+function toggleAutoText(){autoText=!autoText; toast(autoText?"Area texts on":"Area texts off"); renderZones()}
+function renderZones(){
+  const stops=routeStops();
+  const areas=[...new Set(stops.map(s=>areaOf(s.o)))];
+  let html=`<div class="autobar" style="margin-bottom:6px"><div style="flex:1"><b>Text people along my route</b>When your route passes through an area, people there who opted in get one text, about 5 min before you arrive.</div><button class="switch ${autoText?'on':''}" onclick="toggleAutoText()"></button></div>`;
+  if(!stops.length){
+    html+=`<div class="zone now" style="margin-top:10px"><div class="ztop"><div class="zt">NOW</div><div class="zn"><b>No orders right now</b><span>Suggested: cruise Downtown. It's been busiest 7–9 PM. Customers see "Cruising Downtown".</span></div></div></div>`;
+  }else{
+    let lastArea=null;
+    html+=stops.map(st=>{const a=areaOf(st.o), newArea=a!==lastArea; lastArea=a;
+      return `${newArea?`<div class="areahead"><span>${a}</span><small>${OPT[a]||0} opted in</small></div>`:''}<div class="zone ${st.now?'now':''}"><div class="ztop"><div class="zt">${st.now?'NOW':'~'+st.eta+' min'}</div><div class="zn"><b>#${st.o.no} · ${st.o.name}</b><span>${st.o.addr} · ${nItems(st.o)} items</span></div>${st.now?'<span class="stagepill" style="background:rgba(61,220,132,.14);color:var(--green)">CURRENT</span>':''}</div></div>`}).join("");
+    html+=`<div class="zone past" style="border-style:dashed;margin-top:10px"><div class="ztop"><div class="zt">THEN</div><div class="zn"><b>Cruise Downtown</b><span>If nothing new comes in</span></div></div></div>`;
+  }
+  const upcoming=areas.slice(1).filter(a=>!TEXTLOG.some(l=>l.area===a));
+  html+=`<div class="sect"><h3>Area texts tonight</h3><span>${autoText?'Automatic':'Off'}</span></div>`;
+  html+=(autoText?upcoming.map(a=>`<div class="zone"><div class="ztop"><div class="zt">NEXT</div><div class="zn"><b>${a} · ${OPT[a]||0} people</b><span>Sends when you're about 5 min out</span></div></div><div class="preview"><small>THEY'LL GET THIS TEXT</small>🏁 Stockcar is passing through ${a} in about 5 min on its way to a delivery. Order now and it stops at your door.</div></div>`).join(""):"")+
+    [...TEXTLOG].reverse().map(l=>`<div class="zone past"><div class="ztop"><div class="zt">${l.t} PM</div><div class="zn"><b>${l.area} · ${l.n} people</b><span>Text sent</span></div></div></div>`).join("");
+  $("zones").innerHTML=html;
+}
 
 /* ---------- MONEY ---------- */
 function renderMoney(){

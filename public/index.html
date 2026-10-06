@@ -321,7 +321,7 @@ footer a{color:var(--flag)}
 <header class="wrap">
   <div class="logo"><img class="logoimg" src="logo-dark.png" alt="Stockcar" width="303" height="42"></div>
   <h1>Your car is the store.<br><em>Williams Lake orders from it.</em></h1>
-  <p class="lede">A one-month trial: you stock your car with snacks and drinks, drive a posted route each evening, and people order from their phones. Everything they can buy is already in the car, so you deliver it in minutes. Here's exactly how it works, from both sides of the screen, and what it could earn.</p>
+  <p class="lede">A one-month trial: you stock your car with snacks and drinks, drive where the orders take you each evening, and people order from their phones. Everything they can buy is already in the car, so you deliver it in minutes. Here's exactly how it works, from both sides of the screen, and what it could earn.</p>
   <div class="facts">
     <div class="fact">Evenings <b>3–11 PM</b></div>
     <div class="fact">Your car, your stock, <b>your sales</b></div>
@@ -371,12 +371,24 @@ footer a{color:var(--flag)}
 </section>
 
 <section class="wrap">
+  <div class="kicker">The route</div>
+  <h2>The orders decide where the car goes</h2>
+  <p class="sub">No timetable to keep. The app works out the route from the orders waiting, and changes it every time a new one comes in.</p>
+  <div class="cards">
+    <div class="card"><h4>📍 One area at a time</h4><ul><li><span>The app clears every order in an area before moving on, so you're not zig-zagging across town. A new order near where you already are gets slotted straight in.</span></li></ul></div>
+    <div class="card"><h4>💬 Sales along the way</h4><ul><li><span>When the route passes through a neighbourhood, people there who opted in get one text about 5 minutes ahead. Ordering from a car that's already coming down your street is an easy yes.</span></li></ul></div>
+    <div class="card"><h4>⏱️ Honest times</h4><ul><li><span>Customers see where the car is heading next and a live estimate to their door. We never say "Fox Mountain at 9:30", because orders change the plan. If it's busy, they see the longer wait <b>before</b> they pay.</span></li></ul></div>
+    <div class="card"><h4>🚗 No orders? Cruise</h4><ul><li><span>When the list is empty, the app suggests the busiest spot for that hour, and customers see "Cruising Downtown". The first order of the next wave sets the route again.</span></li></ul></div>
+  </div>
+</section>
+
+<section class="wrap">
   <div class="kicker">Who does what</div>
   <h2>Three people, three jobs</h2>
   <div class="cards">
     <div class="card you"><h4>🏁 You, the driver</h4><ul>
       <li>🛒<span><b>Buy the stock</b> (Costco or wholesale) and load the car. It's your inventory.</span></li>
-      <li>🚗<span><b>Drive the route</b> each evening and deliver to front doors.</span></li>
+      <li>🚗<span><b>Go where the orders are.</b> The app plans your stops; you drive and hand off at front doors.</span></li>
       <li>💵<span><b>Keep the sales.</b> During the trial, 100% of it.</span></li>
       <li>📣<span><b>Hustle locally:</b> posters, word of mouth, being the friendly face.</span></li>
     </ul></div>
@@ -390,7 +402,7 @@ footer a{color:var(--flag)}
       <li>🧃<span><b>Mostly teens and young people</b> without cars, wanting snacks after school and at night.</span></li>
       <li>🏠<span>Plus anyone who <b>doesn't want to drive</b> for a pop and chips.</span></li>
       <li>💳<span><b>Pays up front</b> in the app. You never handle cash.</span></li>
-      <li>💬<span>Opts in to get <b>one text</b> when you're in their area.</span></li>
+      <li>💬<span>Opts in to get <b>one text</b> when the car is passing near them.</span></li>
     </ul></div>
   </div>
 </section>
@@ -502,11 +514,11 @@ const dNav=i=>`<div class="navmini">${["🏁","📦","🗺️","💵"].map((e,k)
 const C=(body,nav)=>C_HEAD+`<div class="body anim">${body}</div>`+cNav(nav);
 const D=(body,nav)=>D_HEAD+`<div class="body anim">${body}</div>`+dNav(nav);
 
-const cHome=(sms)=>C(`${sms?`<div class="sms"><div class="ic">💬</div><div><b>Stockcar · now</b><p>🏁 Stockcar is in Westridge until 8 PM. Order now and it's at your door in about 10 min.</p></div></div>`:''}
- <div class="live"><div class="t"><i></i>OUT NOW · UNTIL 11 PM</div><h4>In Westridge right now</h4><p>Parked on Westridge Dr until 8:00, then Downtown.</p>
- <div class="lsr"><div><b>~9 min</b><span>To your door</span></div><div><b>$3</b><span>Delivery</span></div><div><b>148</b><span>On board</span></div></div></div>
- <div class="mh">Tonight's route</div>
- <div class="rt"><div><span>4:30–6:00</span>Glendale</div><div class="now"><span>6:00–8:00</span>Westridge<em>NOW</em></div><div><span>8:00–9:30</span>Downtown</div><div><span>9:30–11:00</span>Fox Mountain</div></div>
+const cHome=(sms)=>C(`${sms?`<div class="sms"><div class="ic">💬</div><div><b>Stockcar · now</b><p>🏁 Stockcar is passing through Westridge in about 5 min on its way to a delivery. Order now and it stops at your door.</p></div></div>`:''}
+ <div class="live"><div class="t"><i></i>ON THE ROAD · UNTIL 11 PM</div><h4>Heading to Westridge next</h4><p>2 stops planned. It passes near you on the way.</p>
+ <div class="lsr"><div><b>~8 min</b><span>To your door</span></div><div><b>$3</b><span>Delivery</span></div><div><b>148</b><span>On board</span></div></div></div>
+ <div class="mh">Where the car is heading <span style="color:#1F9D55;font-size:9px">● LIVE</span></div>
+ <div class="rt"><div class="now"><span>NOW</span>Downtown<em>HERE</em></div><div><span>~6 min</span>Westridge<em style="background:#E7F6EE;color:#1F9D55">NEAR YOU</em></div><div><span>~15 min</span>Glendale</div><div style="color:var(--psoft)"><span>Then</span>Cruising Downtown</div></div>
  <div class="mh">Popular tonight</div>
  <div class="g2"><div class="pc"><div class="e">🌶️</div>Takis Fuego<div class="pr">$5.99<i>+</i></div></div><div class="pc"><div class="e">🥤</div>Coca-Cola<div class="pr">$3.29<i>+</i></div></div></div>`,0);
 
@@ -526,16 +538,18 @@ const cTrack=(stage,x,y,eta)=>C(`${MAP(x,y)}<div class="trk"><h5>${["Order recei
  ${[["Order received","Paid · sent to the driver"],["Driver accepted","Packing it from the car"],["On the way","Coming from Westridge Dr"],["Delivered","At your front door"]].map((s,i)=>`<div class="st ${i<stage||stage===3?'ok':i===stage?'now':''}"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div>
  <div class="eta"><span>${stage===3?'Delivered':'Estimated arrival'}</span><b>${eta}</b></div>`,3);
 
-const dRoute=(sent)=>D(`<div style="font-family:var(--display);font-weight:800;font-size:12.5px;margin:2px 2px 7px">Tonight's route</div>
- <div class="zone past"><div class="zt"><span>4:30–6:00</span><b>Glendale</b></div><div class="zb sent">✓ Area text sent 4:31</div></div>
- <div class="zone now"><div class="zt"><span>6:00–8:00</span><b>Westridge</b><small style="color:var(--green);font-weight:800;font-size:8px">NOW</small></div>
-  <div class="zb ${sent?'sent':'pulse'}">${sent?'✓ Texted 31 people at 7:12':'💬 Text the 31 people in Westridge'}</div></div>
- <div class="zone"><div class="zt"><span>8:00–9:30</span><b>Downtown</b></div></div>
- <div class="zone"><div class="zt"><span>9:30–11:00</span><b>Fox Mountain</b></div></div>
- <div class="voice" style="margin-top:6px">📦 <b>148 items</b> in the car · cooler at 4°C</div>`,2);
+const dRoute=(sent)=>D(`<div style="font-family:var(--display);font-weight:800;font-size:12.5px;margin:2px 2px 4px">Live route</div>
+ <div style="font-size:9.5px;color:var(--soft);margin:0 2px 6px">Built from your orders, one area at a time</div>
+ <div style="font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--flag);margin:6px 2px 4px">DOWNTOWN</div>
+ <div class="zone now"><div class="zt"><span>NOW</span><b>#1036 · Olivia</b><small style="color:var(--green);font-weight:800;font-size:8px">CURRENT</small></div></div>
+ <div style="font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--flag);margin:6px 2px 4px">WESTRIDGE · 31 OPTED IN</div>
+ <div class="zone"><div class="zt"><span>~6 min</span><b>#1037 · Ethan</b></div></div>
+ <div style="font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--flag);margin:6px 2px 4px">GLENDALE</div>
+ <div class="zone"><div class="zt"><span>~15 min</span><b>#1039 · Chloe</b></div></div>
+ <div class="zone" style="margin-top:6px"><div class="zb ${sent?'sent':'pulse'}" style="margin-top:0">${sent?'✓ Auto-text sent: Westridge · 31 people':'💬 Westridge text sends when you\'re ~5 min out'}</div></div>`,2);
 
 const dIdle=()=>D(`<div class="voice" style="margin-top:2px"><b>Auto-accept is on.</b> New orders go straight to your list and get read out loud.</div>
- <div class="idle"><div class="e">🏁</div><b style="color:var(--ink)">All caught up.</b><br>Parked in Westridge until 8:00.</div>`,0);
+ <div class="idle"><div class="e">🏁</div><b style="color:var(--ink)">All caught up.</b><br>Passing through Westridge. New orders get slotted into your route.</div>`,0);
 
 const PACK=[["1×","🌶️ Takis Fuego"],["2×","🥤 Coca-Cola (cooler)"],["2×","🍫 KitKat"],["1×","🐂 Red Bull (16+)"]];
 const dOrder=(ticks)=>D(`<div class="voice" style="margin:0 0 8px">🔊 <b>"New order. 6 items, Westridge Drive."</b></div>
@@ -562,11 +576,11 @@ const dMoney=()=>D(`<div class="net"><span>YOU KEEP TONIGHT · SO FAR</span><b>$
 const STEPS=[
  {t:"The car is the store",focus:"both",
   txt:"Before the shift, you load the car: chips, candy, cold drinks in a powered cooler, a few essentials. <b>That's the whole menu.</b> Customers only ever see what's physically in your car, so nothing is ever \"out of stock\" after they've paid.",
-  who:[["y","YOU","Stock the car and post tonight's route: which neighbourhood, which hours."],["c","CUSTOMER","Sees the car is in Westridge right now, and roughly how fast it can get to them."]],
+  who:[["y","YOU","Stock the car and switch on. The app builds your route from the orders as they come in."],["c","CUSTOMER","Sees where the car is heading next, and roughly how long it would take to reach them."]],
   c:()=>cHome(false),d:()=>dRoute(false)},
- {t:"One text to the neighbourhood",focus:"D",
-  txt:"When you arrive in a zone, one tap texts everyone there who opted in. <b>No discounts, no spam,</b> just \"we're here until 8.\" Predictable nights build habits: people learn that Thursday is Stockcar night in Westridge.",
-  who:[["y","YOU","Tap once when you reach the zone. That's your marketing for the hour."],["c","CUSTOMER","Gets one text. Taps it, the app opens."]],
+ {t:"Texts along the way",focus:"both",
+  txt:"There's no fixed schedule. <b>The route follows the orders:</b> the app finishes one area, then moves to the next. When the route is about to pass through a neighbourhood, people there who opted in get one text automatically, about 5 minutes ahead. Those are the easiest sales of the night, because you're already driving by.",
+  who:[["y","YOU","Nothing to tap. The texts go out on their own."],["c","CUSTOMER","Gets one text: \"passing through in about 5 min.\" Taps it, the app opens."]],
   c:()=>cHome(true),d:()=>dRoute(true)},
  {t:"A customer builds an order",focus:"C",
   txt:"Jordan adds Takis, two Cokes, two KitKats and a Red Bull. <b>Flat $3 delivery,</b> free over $25, $10 minimum. The energy drink asks him to confirm he's 16 or older.",
