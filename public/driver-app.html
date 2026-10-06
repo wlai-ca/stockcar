@@ -248,7 +248,9 @@ body{font-family:var(--body);color:var(--ink);background:#0A0B0D;background-imag
           <p id="netSub"></p>
         </div>
         <div class="brk" id="breakdown"></div>
-        <p class="fineprint">Taxes and bottle deposits customers pay are passed through, not your money. During the trial month, the software is free: you keep 100% of what's shown here.</p>
+        <div class="sect"><h3>Added stops tonight</h3><span>Worth it?</span></div>
+        <div class="brk" id="addedStops" style="margin-top:0"></div>
+        <p class="fineprint">Customers get $1 credit for every stop added before theirs, and their delivery fee back as credit if they're more than 15 min past the quoted time. Taxes and bottle deposits customers pay are passed through, not your money. During the trial month, the software is free: you keep 100% of what's shown here.</p>
         <div class="sect"><h3>Last 7 nights</h3><span>What you kept each night</span></div>
         <div class="week" id="week"></div>
         <div class="sect"><h3>Trial targets</h3><span>Week 2 of 4</span></div>
@@ -305,22 +307,22 @@ const sk=id=>STOCK.find(s=>s.id==id);
 /* past deliveries tonight: subtotal is item sales; fee = delivery fee charged */
 let done=[
  {no:1031,name:"Ava",addr:"Downtown",items:{10:2,13:2,7:1},fee:3,t:"3:22"},
- {no:1032,name:"Liam",addr:"Downtown",items:{4:1,5:1,13:1,18:1},fee:3,t:"3:51"},
- {no:1033,name:"Noah",addr:"Glendale",items:{1:1,2:1,10:2,12:2,13:2},fee:0,t:"4:40"},
- {no:1034,name:"Emma",addr:"Glendale",items:{6:1,7:2},fee:3,t:"5:15"},
+ {no:1032,name:"Liam",addr:"Downtown",items:{4:1,5:1,13:1,18:1},fee:3,t:"3:51",cu:2},
+ {no:1033,name:"Noah",addr:"Glendale",items:{1:1,2:1,10:2,12:2,13:2},fee:0,t:"4:40",added:1},
+ {no:1034,name:"Emma",addr:"Glendale",items:{6:1,7:2},fee:3,t:"5:15",ra:1,cu:1},
  {no:1035,name:"Mason",addr:"Glendale",items:{24:1,13:1},fee:3,t:"5:48"},
- {no:1036,name:"Olivia",addr:"Westridge",items:{23:1,15:2,10:1},fee:3,t:"6:20"},
- {no:1037,name:"Ethan",addr:"Westridge",items:{1:2,13:3,12:1,6:1},fee:0,t:"6:51"},
+ {no:1036,name:"Olivia",addr:"Westridge",items:{23:1,15:2,10:1},fee:3,t:"6:20",ra:1},
+ {no:1037,name:"Ethan",addr:"Westridge",items:{1:2,13:3,12:1,6:1},fee:0,t:"6:51",added:1},
 ];
 let current={no:1038,name:"Jordan",addr:"48 Westridge Dr",area:"Westridge",km:1.6,eta:4,items:{4:1,13:2,10:2,19:1},fee:3,stage:"pack",ticked:{}};
-let queue=[{no:1039,name:"Chloe",addr:"Westridge Pl",area:"Westridge",km:0.9,eta:3,items:{7:2,15:1,3:1},fee:3}];
+let queue=[{no:1039,name:"Chloe",addr:"Westridge Pl",area:"Westridge",km:0.9,eta:3,items:{7:2,15:1,3:1},fee:3},{no:1040,name:"Ava",addr:"Glendale Dr",area:"Glendale",km:2.2,eta:7,items:{7:1,13:2},fee:3}];
 const POOL=[
- {name:"Ben",area:"Westridge",addr:"Westridge Cres",km:1.2,eta:4,items:{5:1,13:1,7:1},fee:3},
  {name:"Maya",area:"Glendale",addr:"Glendale Dr",km:0.7,eta:2,items:{1:1,4:1,13:2,12:2},fee:3},
+ {name:"Ben",area:"Westridge",addr:"Westridge Cres",km:1.2,eta:4,items:{5:1,13:1,7:1},fee:3},
  {name:"Jack",area:"Lakeview",addr:"Lakeview Ave",km:2.1,eta:6,items:{18:2,2:1},fee:3},
  {name:"Sofia",area:"Fox Mountain",addr:"Fox Mountain Rd",km:1.0,eta:3,items:{10:3,6:1,15:2},fee:3},
 ];
-let nextNo=1040, auto=true, onShift=true, kmDriven=31, shiftStart=15; /* 3:00 PM */
+let nextNo=1041, auto=true, onShift=true, kmDriven=31, shiftStart=15; /* 3:00 PM */
 const $=id=>document.getElementById(id);
 const sub=o=>Object.entries(o.items).reduce((a,[id,q])=>a+sk(id).price*q,0);
 const cogs=o=>Object.entries(o.items).reduce((a,[id,q])=>a+sk(id).cost*q,0);
@@ -423,7 +425,9 @@ function routeStops(){
 }
 function routeInsert(o){ /* slot a new order in after the last stop in the same area */
   const a=areaOf(o); let at=-1; queue.forEach((q,i)=>{if(areaOf(q)===a) at=i});
-  if(at>=0) queue.splice(at+1,0,o); else if(current&&areaOf(current)===a) queue.unshift(o); else queue.push(o);
+  let k;
+  if(at>=0){k=at+1; queue.splice(k,0,o)} else if(current&&areaOf(current)===a){k=0; queue.unshift(o)} else {queue.push(o); return}
+  for(let i=k+1;i<queue.length;i++){queue[i].added=(queue[i].added||0)+1; toast(`${queue[i].name} gets $1 credit: stop added before theirs`)}
 }
 function toggleAutoText(){autoText=!autoText; toast(autoText?"Area texts on":"Area texts off"); renderZones()}
 function renderZones(){
@@ -435,7 +439,7 @@ function renderZones(){
   }else{
     let lastArea=null;
     html+=stops.map(st=>{const a=areaOf(st.o), newArea=a!==lastArea; lastArea=a;
-      return `${newArea?`<div class="areahead"><span>${a}</span><small>${OPT[a]||0} opted in</small></div>`:''}<div class="zone ${st.now?'now':''}"><div class="ztop"><div class="zt">${st.now?'NOW':'~'+st.eta+' min'}</div><div class="zn"><b>#${st.o.no} · ${st.o.name}</b><span>${st.o.addr} · ${nItems(st.o)} items</span></div>${st.now?'<span class="stagepill" style="background:rgba(61,220,132,.14);color:var(--green)">CURRENT</span>':''}</div></div>`}).join("");
+      return `${newArea?`<div class="areahead"><span>${a}</span><small>${OPT[a]||0} opted in</small></div>`:''}<div class="zone ${st.now?'now':''}"><div class="ztop"><div class="zt">${st.now?'NOW':'~'+st.eta+' min'}</div><div class="zn"><b>#${st.o.no} · ${st.o.name}</b><span>${st.o.addr} · ${nItems(st.o)} items</span></div>${st.now?'<span class="stagepill" style="background:rgba(61,220,132,.14);color:var(--green)">CURRENT</span>':st.o.added?`<span class="stagepill" style="background:rgba(94,162,255,.14);color:var(--blue)">+$${st.o.added} CREDIT</span>`:''}</div></div>`}).join("");
     html+=`<div class="zone past" style="border-style:dashed;margin-top:10px"><div class="ztop"><div class="zt">THEN</div><div class="zn"><b>Cruise Downtown</b><span>If nothing new comes in</span></div></div></div>`;
   }
   const upcoming=areas.slice(1).filter(a=>!TEXTLOG.some(l=>l.area===a));
@@ -450,7 +454,9 @@ function renderMoney(){
   const sales=done.reduce((a,o)=>a+sub(o),0), fees=done.reduce((a,o)=>a+o.fee,0), cost=done.reduce((a,o)=>a+cogs(o),0);
   const charged=done.reduce((a,o)=>a+(sub(o)+o.fee)*1.08,0); /* ~tax+deposit on the card charge */
   const card=charged*0.029+done.length*0.30, gas=kmDriven*0.18;
-  const net=sales+fees-cost-card-gas;
+  const used=done.reduce((a,o)=>a+(o.cu||0),0);
+  const net=sales+fees-cost-card-gas-used;
+  const ra=done.filter(o=>o.ra), raEarn=ra.reduce((a,o)=>a+sub(o)-cogs(o)+o.fee,0), given=done.reduce((a,o)=>a+(o.added||0),0);
   const hrs=Math.max(1,(clockMin-shiftStart*60)/60);
   $("netBig").textContent=money(net);
   $("netSub").textContent=`${done.length} orders · ${hrs.toFixed(1)} hrs on shift · ${money(net/hrs)}/hr`;
@@ -460,8 +466,13 @@ function renderMoney(){
    <div class="br minus"><span>What the stock cost you<small>Costco / wholesale price</small></span><span>−${money(cost)}</span></div>
    <div class="br minus"><span>Card fees<small>about 2.9% + 30¢ per order</small></span><span>−${money(card)}</span></div>
    <div class="br minus"><span>Gas<small>${kmDriven.toFixed(0)} km × 18¢</small></span><span>−${money(gas)}</span></div>
+   <div class="br minus"><span>Customer credit used<small>Earned on earlier orders when stops were added</small></span><span>−${money(used)}</span></div>
    <div class="br minus"><span>Stockcar software<small>Free during the trial month</small></span><span>−$0.00</span></div>
    <div class="br total"><span>You keep</span><span>${money(net)}</span></div>`;
+  $("addedStops").innerHTML=`
+   <div class="br plus"><span>Orders picked up along the way<small>${ra.length} orders the route passed by</small></span><span>+${money(raEarn)}</span></div>
+   <div class="br minus"><span>Credit given for the wait<small>$1 to each customer a stop was added ahead of (${given})</small></span><span>−${money(given)}</span></div>
+   <div class="br total"><span>Added stops paid you</span><span>${money(raEarn-given)}</span></div>`;
   const wk=[["Wed",71],["Thu",58],["Fri",126],["Sat",149],["Sun",44],["Mon",52],["Tue",0]];
   const todayIdx=6; wk[todayIdx][1]=Math.round(net);
   const mx=Math.max(...wk.map(w=>w[1]),1);

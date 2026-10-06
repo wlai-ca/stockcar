@@ -377,7 +377,8 @@ footer a{color:var(--flag)}
   <div class="cards">
     <div class="card"><h4>📍 One area at a time</h4><ul><li><span>The app clears every order in an area before moving on, so you're not zig-zagging across town. A new order near where you already are gets slotted straight in.</span></li></ul></div>
     <div class="card"><h4>💬 Sales along the way</h4><ul><li><span>When the route passes through a neighbourhood, people there who opted in get one text about 5 minutes ahead. Ordering from a car that's already coming down your street is an easy yes.</span></li></ul></div>
-    <div class="card"><h4>⏱️ Honest times</h4><ul><li><span>Customers see where the car is heading next and a live estimate to their door. We never say "Fox Mountain at 9:30", because orders change the plan. If it's busy, they see the longer wait <b>before</b> they pay.</span></li></ul></div>
+    <div class="card"><h4>⏱️ Honest times</h4><ul><li><span>Customers see where the car is heading and a live estimate to their door, never "Fox Mountain at 9:30". At checkout they get an "arrives by" time.</span></li></ul></div>
+    <div class="card"><h4>💳 Waiting earns credit</h4><ul><li><span>Every stop added before someone's order earns them <b>$1 credit</b> for next time. More than 15 min past the quoted time, their delivery fee comes back as credit too. The extra stop pays far more than the dollar, and the credit brings them back.</span></li></ul></div>
     <div class="card"><h4>🚗 No orders? Cruise</h4><ul><li><span>When the list is empty, the app suggests the busiest spot for that hour, and customers see "Cruising Downtown". The first order of the next wave sets the route again.</span></li></ul></div>
   </div>
 </section>
@@ -473,6 +474,7 @@ footer a{color:var(--flag)}
       <div class="row">💵<span><b>You keep 100%</b> of sales and delivery fees. The software is free.</span></div>
       <div class="row">🎨<span><b>Oran covers</b> the app, the car vinyl, and marketing help.</span></div>
       <div class="row">💳<span><b>Card and Apple Pay only,</b> paid in the app before you drive. No cash.</span></div>
+      <div class="row">⏱️<span><b>Credit for waiting</b> comes out of your sales when customers use it, but the extra stops that cause it earn you far more. The driver app tracks both so you can check.</span></div>
       <div class="row">🤝<span><b>After the trial, if it works:</b> the software is <span class="blank">___%</span> of sales or <span class="blank">$___</span>/month. We fill this in together <b>before</b> day one, so nobody's surprised later.</span></div>
     </div>
     <div class="tbox"><h4>✅ Before day one</h4>
@@ -529,6 +531,7 @@ const cCart=(pulse)=>C(`<div class="mh" style="margin-top:4px">Your order</div>
  <div class="cl"><span class="e">🐂</span><b>Red Bull <small style="color:#6D3FD1">16+</small></b><span>$4.49</span></div>
  <div class="tot"><div><span>Items</span><span>$22.04</span></div><div><span>Delivery</span><span>$3.00</span></div><div><span>Deposit</span><span>$0.30</span></div><div><span>GST / PST</span><span>$2.03</span></div><div class="g"><span>Total</span><span>$27.37</span></div></div>
  <div style="font-size:9.5px;background:#F1EAFE;border-radius:9px;padding:6px 8px;margin-top:6px">☑ I'm 16 or older (energy drink)</div>
+ <div style="font-size:9.5px;background:#EEF6F1;border-radius:9px;padding:6px 8px;margin-top:6px;line-height:1.4">⏱️ <b>Arrives by about 7:20.</b> Stops added before yours earn you $1 credit each.</div>
  <div class="apay ${pulse?'pulse':''}">Apple Pay · $27.37</div>`,2);
 
 const cSheet=()=>C(`<div class="sheet"><div class="big">🏁</div><h4>ORDER IN!</h4><p>Order #1038 is paid.<br>The driver is pulling it off the car now.</p></div>`,3);
