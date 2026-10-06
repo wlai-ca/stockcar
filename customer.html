@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#121418">
+<title>Stockcar — Customer App</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#121418;--panel:#1B1E24;--line:#2F343D;--ink:#EEF0F3;--soft:#8D94A1;--red:#FF4D3D;--flag:#FFC83D;
+  --display:"Archivo","Arial Black",sans-serif;--body:"Inter",system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--body);color:var(--ink);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,#23262E 0%,var(--bg) 60%);min-height:100vh;line-height:1.5}
+.strip{height:10px;background:conic-gradient(#fff 25%,var(--bg) 0 50%,#fff 0 75%,var(--bg) 0) 0 0/10px 10px}
+.wrap{max-width:1060px;margin:0 auto;padding:36px 20px calc(40px + env(safe-area-inset-bottom));display:flex;gap:56px;align-items:center;min-height:calc(100vh - 10px)}
+.text{flex:1;max-width:520px}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;text-decoration:none;color:var(--ink)}
+.flagmark{width:26px;height:26px;border-radius:6px;background:conic-gradient(#fff 25%,var(--bg) 0 50%,#fff 0 75%,var(--bg) 0) 0 0/13px 13px;box-shadow:0 0 0 2px #fff}
+.wordmark{font-family:var(--display);font-stretch:125%;font-weight:900;font-style:italic;font-size:22px;line-height:1}
+.wordmark span{color:var(--red)}
+.tag{display:inline-block;background:rgba(255,200,61,.12);color:var(--flag);border:1px solid rgba(255,200,61,.4);padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+h1{font-family:var(--display);font-stretch:115%;font-weight:900;font-size:clamp(32px,7vw,46px);line-height:1.02;margin:14px 0 14px}
+h1 em{color:var(--flag);font-style:italic}
+.lede{font-size:16px;color:#C3C8D1}
+ul{list-style:none;margin:20px 0 4px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:6px 16px}
+li{display:flex;gap:12px;font-size:15px;line-height:1.45;padding:11px 0;border-bottom:1px solid var(--line);color:#C9CED7}
+li:last-child{border-bottom:none}
+li b{color:var(--ink)}
+.go{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:22px;background:var(--red);color:#fff;text-decoration:none;font-weight:800;font-size:17px;border-radius:16px;padding:18px}
+.go:active{transform:scale(.98)}
+.tip{font-size:13px;color:var(--soft);margin-top:14px;line-height:1.5}
+.tip b{color:#C9CED7}
+.links{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:22px;font-size:14px}
+.links a{color:var(--flag);text-decoration:none;font-weight:600}
+.preview{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.preview small{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.phone{width:400px;height:820px;max-height:calc(100vh - 110px);background:#000;border-radius:44px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 2px #333}
+.phone iframe{width:100%;height:100%;border:0;border-radius:35px;display:block;background:#000}
+@media(max-width:900px){
+  .preview{display:none}
+  .wrap{display:block;min-height:0;padding-top:28px}
+}
+.logoimg{display:block;height:auto;max-width:100%}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap">
+  <div class="text">
+    <a class="logo" href="index.html"><img class="logoimg" src="logo-dark.png" alt="Stockcar" width="260" height="36"></a>
+    <span class="tag">The customer side</span>
+    <h1>The corner store <em>is a car.</em></h1>
+    <p class="lede">This is what people in Williams Lake would see. Everything for sale is already in the car, so delivery starts the moment they order. The car works a posted route of neighbourhoods each evening, 3–11 PM.</p>
+    <ul><li>🍫<span><b>Menu:</b> add a few snacks. It's only what's in the car tonight.</span></li><li>🛒<span><b>Cart:</b> flat $3 delivery, free over $25. Pay with Apple Pay (pretend).</span></li><li>📍<span><b>Order:</b> watch the car drive to your door.</span></li><li>💬<span>A few seconds in, you'll get the <b>"we're in your area" text</b> customers opt in to.</span></li></ul>
+    <a class="go" href="customer-app.html">Try the customer app →</a>
+    <p class="tip">It opens full screen. Nothing is real and no money moves, so tap anything. To get back here, use your browser's back button.</p>
+    <p class="tip">📲 <b>Even more app-like on iPhone:</b> open the app, tap Share, then Add to Home Screen. It launches without the browser bars.</p>
+    <div class="links"><a href="index.html">‹ How it works</a><a href="driver.html">See the driver side ›</a></div>
+  </div>
+  <div class="preview"><small>Live preview · tap it</small><div class="phone"><iframe src="customer-app.html" title="Customer App preview" loading="lazy"></iframe></div></div>
+</div>
+</body>
+</html>

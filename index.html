@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#121418">
+<title>Stockcar — How It Works</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121418; --panel:#1B1E24; --panel2:#242830; --line:#2F343D; --ink:#EEF0F3; --soft:#8D94A1;
+  --red:#FF4D3D; --red2:#E23B2E; --flag:#FFC83D; --green:#3DDC84; --blue:#5EA2FF; --violet:#B497FF;
+  --paper:#F6F4EF; --pink:#15171C; --pline:#E6E2D9; --psoft:#646a76;
+  --display:"Archivo","Arial Black",sans-serif; --body:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--ink);background:var(--bg);line-height:1.5}
+button{font-family:var(--body);touch-action:manipulation}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.check-strip{height:10px;background:conic-gradient(#fff 25%,var(--bg) 0 50%,#fff 0 75%,var(--bg) 0) 0 0/10px 10px;opacity:.9}
+
+/* hero */
+
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.flagmark{width:28px;height:28px;border-radius:6px;background:conic-gradient(#fff 25%,var(--bg) 0 50%,#fff 0 75%,var(--bg) 0) 0 0/14px 14px;box-shadow:0 0 0 2px #fff}
+.wordmark{font-family:var(--display);font-stretch:125%;font-weight:900;font-style:italic;font-size:24px;line-height:1}
+.wordmark span{color:var(--red)}
+h1{font-family:var(--display);font-stretch:118%;font-weight:900;font-size:clamp(34px,6vw,62px);line-height:.98;letter-spacing:-.01em;max-width:860px}
+h1 em{color:var(--flag);font-style:italic}
+.lede{font-size:clamp(15px,2vw,18px);color:#C3C8D1;max-width:680px;margin-top:18px}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:600;color:#D6DAE1}
+.fact b{color:var(--flag)}
+
+section.wrap{padding-top:44px;padding-bottom:44px}
+header.wrap{padding-top:44px;padding-bottom:20px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+h2{font-family:var(--display);font-stretch:112%;font-weight:900;font-size:clamp(24px,3.4vw,34px);line-height:1.05;margin-bottom:10px}
+.sub{color:#B3B9C3;max-width:680px;font-size:15px}
+
+/* walkthrough */
+.walk{display:grid;grid-template-columns:300px 1fr 300px;gap:28px;align-items:center;margin-top:26px}
+.phonecol{display:flex;flex-direction:column;align-items:center;gap:10px}
+.plabel{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);display:flex;align-items:center;gap:8px}
+.plabel i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.3s}
+.phonecol.focus .plabel{color:var(--ink)}
+.phonecol.focus .plabel i{background:var(--flag);box-shadow:0 0 10px var(--flag)}
+.phone{width:290px;height:600px;background:#000;border-radius:38px;padding:9px;box-shadow:0 24px 60px rgba(0,0,0,.6),inset 0 0 0 2px #333;transition:transform .35s,opacity .35s,filter .35s}
+.phonecol:not(.focus) .phone{opacity:.55;filter:saturate(.6);transform:scale(.97)}
+.scr{width:100%;height:100%;border-radius:30px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.scr.c{background:var(--paper);color:var(--pink)}
+.scr.d{background:var(--bg);color:var(--ink)}
+.sb{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:10px;font-weight:700;flex-shrink:0}
+.scr.d .sb{color:var(--soft)}
+.ab{display:flex;align-items:center;justify-content:space-between;padding:4px 14px 8px;flex-shrink:0}
+.ab .lg{display:flex;align-items:center;gap:6px}
+.fm{width:16px;height:16px;border-radius:4px;background:conic-gradient(#15171C 25%,#fff 0 50%,#15171C 0 75%,#fff 0) 0 0/8px 8px;box-shadow:0 0 0 1.5px #15171C}
+.scr.d .fm{background:conic-gradient(#fff 25%,#121418 0 50%,#fff 0 75%,#121418 0) 0 0/8px 8px;box-shadow:0 0 0 1.5px #fff}
+.wm{font-family:var(--display);font-stretch:125%;font-weight:900;font-style:italic;font-size:15px;line-height:1}
+.wm span{color:var(--red2)}
+.ab small{font-size:9px;font-weight:700;color:var(--psoft);letter-spacing:.06em}
+.scr.d .ab small{color:var(--soft)}
+.body{flex:1;overflow:hidden;padding:0 12px;position:relative}
+.anim{animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{50%{opacity:.3}}
+
+/* mini customer components */
+.live{background:#15171C;color:#fff;border-radius:15px;padding:12px}
+.live .t{font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--flag);display:flex;gap:5px;align-items:center}
+.live .t i{width:6px;height:6px;border-radius:50%;background:var(--flag);animation:pulse 1.4s infinite}
+.live h4{font-family:var(--display);font-stretch:110%;font-weight:800;font-size:16px;margin:5px 0 2px}
+.live p{font-size:10px;color:#B8BDC7}
+.lsr{display:flex;gap:6px;margin-top:9px}
+.lsr div{flex:1;background:rgba(255,255,255,.08);border-radius:9px;padding:6px 7px}
+.lsr b{display:block;font-family:var(--display);font-weight:800;font-size:12.5px}
+.lsr span{font-size:8px;color:#9EA4AF}
+.mh{font-family:var(--display);font-stretch:108%;font-weight:800;font-size:12.5px;margin:12px 2px 7px}
+.rt{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.rt div{display:flex;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--pline);font-size:10.5px;font-weight:600}
+.rt div:last-child{border-bottom:none}
+.rt span{font-size:9px;color:var(--psoft);min-width:56px;font-weight:700}
+.rt .now{background:#FFF7E0}
+.rt .now span{color:var(--red2)}
+.rt em{margin-left:auto;font-style:normal;font-size:7.5px;font-weight:800;background:var(--red2);color:#fff;padding:2px 6px;border-radius:99px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pc{background:#fff;border-radius:12px;padding:8px;box-shadow:0 2px 10px rgba(0,0,0,.06);font-size:10px;font-weight:700}
+.pc .e{font-size:22px;text-align:center;padding:2px 0 4px}
+.pc .pr{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-family:var(--display);font-weight:800}
+.pc .pr i{width:18px;height:18px;border-radius:6px;background:var(--red2);color:#fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:12px}
+.cl{background:#fff;border-radius:11px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:10.5px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.cl .e{font-size:17px}
+.cl b{flex:1}
+.cl span{font-family:var(--display);font-weight:800}
+.tot{background:#fff;border-radius:12px;padding:10px;margin-top:6px;font-size:10px;color:var(--psoft);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.tot div{display:flex;justify-content:space-between;margin-bottom:4px}
+.tot .g{color:var(--pink);font-family:var(--display);font-weight:800;font-size:13px;border-top:1px solid var(--pline);padding-top:6px;margin:6px 0 0}
+.apay{background:#000;color:#fff;border-radius:11px;text-align:center;padding:11px;font-size:12px;font-weight:700;margin-top:8px}
+.apay.pulse{animation:glow 1.2s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 4px rgba(226,59,46,.35)}}
+.sms{position:absolute;top:6px;left:8px;right:8px;background:rgba(240,240,242,.98);border-radius:13px;padding:9px 10px;box-shadow:0 10px 24px rgba(0,0,0,.25);display:flex;gap:8px;z-index:5;animation:drop .5s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes drop{from{transform:translateY(-130%)}to{transform:none}}
+.sms .ic{width:26px;height:26px;border-radius:7px;background:#1F9D55;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sms b{font-size:10.5px;color:#111;display:block}
+.sms p{font-size:10px;color:#222;line-height:1.35}
+.sheet{position:absolute;inset:0;background:#15171C;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+.sheet .big{font-size:44px}
+.sheet h4{font-family:var(--display);font-stretch:115%;font-weight:900;font-style:italic;font-size:22px;color:var(--flag);margin:8px 0 6px}
+.sheet p{font-size:11px;color:#C9CDD5;line-height:1.5}
+.map{border-radius:13px;overflow:hidden;background:#E9ECE4;margin-bottom:8px}
+.map svg{display:block;width:100%;height:auto}
+.trk{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.trk h5{font-family:var(--display);font-weight:800;font-size:13px;margin-bottom:8px}
+.st{position:relative;padding:0 0 9px 18px;font-size:10px}
+.st::before{content:"";position:absolute;left:0;top:2px;width:9px;height:9px;border-radius:50%;border:2px solid var(--pline);background:#fff}
+.st.ok::before{background:#15171C;border-color:#15171C}
+.st.now::before{background:var(--red2);border-color:var(--red2);animation:pulse 1.2s infinite}
+.st b{display:block;font-size:10.5px}
+.st span{color:var(--psoft)}
+.eta{background:#15171C;color:#fff;border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:10.5px}
+.eta b{font-family:var(--display);font-weight:800;font-size:17px;color:var(--flag)}
+
+/* mini driver components */
+.dcard{background:var(--panel);border:1.5px solid var(--flag);border-radius:15px;padding:11px}
+.dcard .h{display:flex;justify-content:space-between;align-items:center}
+.dcard .h b{font-family:var(--mono);font-size:10.5px;color:var(--flag)}
+.dcard .h span{font-size:8px;font-weight:800;letter-spacing:.08em;padding:3px 7px;border-radius:99px;background:rgba(255,200,61,.14);color:var(--flag)}
+.dcard h4{font-family:var(--display);font-stretch:108%;font-weight:800;font-size:16px;margin:5px 0 1px}
+.dcard .w{font-size:9.5px;color:var(--soft);margin-bottom:8px}
+.pk{background:var(--panel2);border-radius:10px;margin-bottom:8px}
+.pk div{display:flex;gap:7px;align-items:center;padding:6px 9px;font-size:10.5px;border-bottom:1px solid var(--line)}
+.pk div:last-child{border-bottom:none}
+.pk i{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--soft);font-style:normal;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pk .ok i{background:var(--green);border-color:var(--green);color:#000}
+.pk .ok span{text-decoration:line-through;color:var(--soft)}
+.pk q{font-family:var(--mono);font-weight:700;color:var(--flag);quotes:none}
+.dbtn{border-radius:11px;padding:11px;text-align:center;font-weight:800;font-size:12px}
+.dbtn.blue{background:var(--blue);color:#0A1630}
+.dbtn.green{background:var(--green);color:#06240F}
+.dbtn.off{background:var(--panel2);color:var(--soft)}
+.voice{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:8px 10px;font-size:10px;color:#C9CED7;margin-top:8px;line-height:1.45}
+.voice b{color:var(--ink)}
+.zone{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:6px;font-size:10.5px}
+.zone.now{border-color:var(--green)}
+.zone.past{opacity:.5}
+.zone .zt{display:flex;gap:8px;align-items:center}
+.zone .zt span{font-family:var(--mono);font-size:9px;color:var(--flag);min-width:58px;font-weight:700}
+.zone .zt b{flex:1}
+.zone .zb{margin-top:7px;background:var(--panel2);border-radius:8px;padding:7px;text-align:center;font-weight:700;font-size:10px}
+.zone .zb.sent{color:var(--green)}
+.zone .zb.pulse{animation:glow2 1.2s infinite}
+@keyframes glow2{50%{box-shadow:0 0 0 3px rgba(255,200,61,.4)}}
+.idle{border:1px dashed var(--line);border-radius:14px;padding:20px 12px;text-align:center;color:var(--soft);font-size:10.5px;margin-top:8px}
+.idle .e{font-size:26px;margin-bottom:4px}
+.drive{position:absolute;inset:0;background:#0A0B0D;display:flex;flex-direction:column;padding:18px 14px}
+.drive .tg{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--blue);display:flex;gap:6px;align-items:center;margin-top:14px}
+.drive .tg i{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:pulse 1.2s infinite}
+.drive h4{font-family:var(--display);font-stretch:115%;font-weight:900;font-size:24px;margin:8px 0 3px}
+.drive .ad{font-size:12px;color:#C9CED7}
+.dm{display:flex;gap:6px;margin:14px 0}
+.dm div{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px}
+.dm b{font-family:var(--mono);font-size:15px;display:block}
+.dm span{font-size:8.5px;color:var(--soft)}
+.drive .sp{flex:1}
+.drive .here{height:70px;border-radius:17px;background:var(--green);color:#06240F;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-stretch:115%;font-weight:900;font-size:19px}
+.net{background:linear-gradient(135deg,#1F232B,#15171C);border:1px solid var(--line);border-radius:14px;padding:12px}
+.net span{font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--soft)}
+.net b{font-family:var(--mono);font-size:26px;color:var(--green);display:block}
+.net p{font-size:9.5px;color:#B6BCC7}
+.bk{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:7px}
+.bk div{display:flex;justify-content:space-between;font-size:10px;padding:3px 0;color:#C9CED7}
+.bk div span:last-child{font-family:var(--mono)}
+.bk .p span:last-child{color:var(--green)}
+.bk .m span:last-child{color:#FF9B90}
+.bk .t{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;font-weight:800;color:var(--ink)}
+.bk .t span:last-child{color:var(--green)}
+.navmini{display:flex;justify-content:space-around;padding:8px 0 12px;border-top:1px solid var(--pline);font-size:15px;flex-shrink:0}
+.scr.d .navmini{border-color:var(--line)}
+.navmini span{opacity:.35;filter:grayscale(1)}
+.navmini span.on{opacity:1;filter:none}
+
+/* step panel */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;min-height:430px;display:flex;flex-direction:column}
+.stepnum{font-family:var(--mono);font-size:12px;color:var(--flag);font-weight:700}
+.panel h3{font-family:var(--display);font-stretch:112%;font-weight:900;font-size:26px;line-height:1.08;margin:8px 0 12px}
+.panel .txt{font-size:15px;color:#C9CED7;line-height:1.6}
+.panel .txt b{color:var(--ink)}
+.who{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.who div{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;background:var(--panel2);border-radius:12px;padding:10px 12px;color:#C9CED7}
+.who div b{color:var(--ink)}
+.who .tag{flex-shrink:0;font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:99px;margin-top:1px}
+.tag.y{background:rgba(255,200,61,.15);color:var(--flag)}
+.tag.c{background:rgba(94,162,255,.15);color:var(--blue)}
+.tag.o{background:rgba(255,77,61,.15);color:#FF8F84}
+.ctrls{margin-top:auto;padding-top:20px;display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.dots button{width:18px;height:6px;border-radius:99px;border:none;background:var(--line);cursor:pointer;padding:0}
+.dots button.on{background:var(--flag)}
+.dots button.seen{background:#5B606A}
+.nb{border:none;border-radius:12px;padding:11px 16px;font-weight:800;font-size:13px;cursor:pointer}
+.nb.back{background:var(--panel2);color:var(--ink)}
+.nb.next{background:var(--flag);color:#15171C}
+.nb.play{background:none;border:1px solid var(--line);color:var(--soft);padding:10px 12px}
+.nb:disabled{opacity:.35;cursor:default}
+.mtabs{display:none}
+
+/* business */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card h4{font-family:var(--display);font-stretch:108%;font-weight:800;font-size:17px;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.card ul{list-style:none}
+.card li{font-size:14px;color:#C9CED7;padding:6px 0;border-bottom:1px solid var(--line);display:flex;gap:9px;line-height:1.45}
+.card li:last-child{border-bottom:none}
+.card li b{color:var(--ink)}
+.card.you{border-top:3px solid var(--flag)}
+.card.oran{border-top:3px solid var(--red)}
+.card.cust{border-top:3px solid var(--blue)}
+
+.order{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.receipt{background:var(--paper);color:var(--pink);border-radius:18px;padding:20px;font-size:14px}
+.receipt h4{font-family:var(--display);font-weight:800;font-size:16px;margin-bottom:12px}
+.rl{display:flex;justify-content:space-between;padding:5px 0;color:#3B414C}
+.rl span:last-child{font-family:var(--mono);font-size:13px}
+.rl.tt{border-top:1.5px dashed #CFC9BC;margin-top:8px;padding-top:10px;font-weight:800;color:var(--pink)}
+.rl small{display:block;font-size:11px;color:var(--psoft)}
+.keep{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.keep h4{font-family:var(--display);font-weight:800;font-size:16px;margin-bottom:12px}
+.kl{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;color:#C9CED7}
+.kl span:last-child{font-family:var(--mono);font-size:13px}
+.kl.p span:last-child{color:var(--green)}
+.kl.m span:last-child{color:#FF9B90}
+.kl.n span:last-child{color:var(--soft)}
+.kl.tt{border-top:1px solid var(--line);margin-top:8px;padding-top:10px;font-weight:800;color:var(--ink)}
+.kl.tt span:last-child{color:var(--green);font-size:16px}
+.kl small{display:block;font-size:11px;color:var(--soft)}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:1.05fr 1fr;gap:16px;margin-top:22px}
+.inputs{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.presets{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.presets button{flex:1;min-width:90px;background:var(--panel2);border:1.5px solid var(--line);color:var(--ink);border-radius:12px;padding:10px;font-weight:700;font-size:13px;cursor:pointer}
+.presets button.on{border-color:var(--flag);color:var(--flag)}
+.presets button small{display:block;font-size:10.5px;color:var(--soft);font-weight:500}
+.rng{margin-bottom:16px}
+.rng label{display:flex;justify-content:space-between;font-size:13px;color:#C9CED7;margin-bottom:6px}
+.rng label b{font-family:var(--mono);color:var(--ink)}
+.rng input{width:100%;accent-color:var(--flag);height:24px}
+.out{background:linear-gradient(160deg,#1F232B,#15171C);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column}
+.big3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big3 div{background:var(--panel2);border-radius:13px;padding:12px}
+.big3 span{font-size:10.5px;font-weight:700;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
+.big3 b{display:block;font-family:var(--mono);font-size:22px;color:var(--green);margin-top:2px}
+.big3 .hr b{color:var(--flag)}
+.verdict{margin-top:12px;border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.45}
+.verdict.bad{background:rgba(255,77,61,.1);color:#FFC2BB}
+.verdict.mid{background:rgba(255,200,61,.1);color:#FFE4A3}
+.verdict.good{background:rgba(61,220,132,.1);color:#B8F2CF}
+.calcbk{margin-top:12px;font-size:12.5px;color:#AEB4BE}
+.calcbk div{display:flex;justify-content:space-between;padding:3px 0}
+.calcbk span:last-child{font-family:var(--mono)}
+.assume{font-size:11.5px;color:var(--soft);margin-top:12px;line-height:1.55}
+
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.tbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.tbox h4{font-family:var(--display);font-weight:800;font-size:17px;margin-bottom:10px}
+.tbox .row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;color:#C9CED7;line-height:1.45}
+.tbox .row:last-child{border-bottom:none}
+.tbox .row b{color:var(--ink)}
+.blank{display:inline-block;min-width:60px;border-bottom:1.5px dashed var(--flag);color:var(--flag);text-align:center;font-family:var(--mono)}
+.chk{list-style:none}
+.chk li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:#C9CED7;line-height:1.45;cursor:pointer;user-select:none}
+.chk li:last-child{border-bottom:none}
+.chk li i{width:20px;height:20px;border-radius:6px;border:2px solid var(--soft);flex-shrink:0;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:12px;margin-top:1px}
+.chk li.ok i{background:var(--green);border-color:var(--green);color:#000}
+.chk li b{color:var(--ink)}
+.chk li.warn b{color:var(--flag)}
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:22px}
+.goal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.goal b{font-family:var(--mono);font-size:24px;color:var(--flag);display:block}
+.goal span{font-size:13.5px;color:#C9CED7}
+.decide{margin-top:14px;background:var(--panel2);border-radius:14px;padding:14px 16px;font-size:14px;color:#C9CED7;line-height:1.55}
+.decide b{color:var(--ink)}
+footer{padding:30px 0 50px;color:var(--soft);font-size:12.5px}
+footer a{color:var(--flag)}
+
+@media(max-width:980px){
+  .walk{grid-template-columns:1fr;gap:16px}
+  .panel{min-height:0;order:-1}
+  .phonecol{display:none}
+  .phonecol.show{display:flex}
+  .phonecol:not(.focus) .phone{opacity:1;filter:none;transform:none}
+  .mtabs{display:flex;gap:8px;justify-content:center;order:0}
+  .mtabs button{background:var(--panel);border:1px solid var(--line);color:var(--soft);border-radius:99px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer}
+  .mtabs button.on{border-color:var(--flag);color:var(--flag)}
+  .order,.calc,.terms{grid-template-columns:1fr}
+}
+@media(max-width:420px){.phone{width:280px;height:580px}.panel{padding:18px}.panel h3{font-size:22px}}
+
+.tryrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;max-width:720px}
+.try{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:16px;transition:transform .15s,border-color .15s}
+.try:active{transform:scale(.98)}
+.try:hover{border-color:var(--flag)}
+.try .ti{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.try.cust .ti{background:#F6F4EF}
+.try.drv .ti{background:#FFC83D}
+.try b{display:block;font-family:var(--display);font-stretch:110%;font-weight:800;font-size:16px;line-height:1.15}
+.try span{font-size:12.5px;color:var(--soft)}
+.try .arr{margin-left:auto;font-size:20px;color:var(--flag);font-weight:800}
+.trynote{font-size:12.5px;color:var(--soft);margin-top:10px}
+.tryband{background:linear-gradient(135deg,#1F232B,#16181D);border:1px solid var(--line);border-radius:22px;padding:22px}
+@media(max-width:640px){.tryrow{grid-template-columns:1fr}}
+.logoimg{display:block;height:auto;max-width:100%}
+</style>
+</head>
+<body>
+<div class="check-strip"></div>
+<header class="wrap">
+  <div class="logo"><img class="logoimg" src="logo-dark.png" alt="Stockcar" width="303" height="42"></div>
+  <h1>Your car is the store.<br><em>Williams Lake orders from it.</em></h1>
+  <p class="lede">A one-month trial: you stock your car with snacks and drinks, drive a posted route each evening, and people order from their phones. Everything they can buy is already in the car, so you deliver it in minutes. Here's exactly how it works, from both sides of the screen, and what it could earn.</p>
+  <div class="facts">
+    <div class="fact">Evenings <b>3–11 PM</b></div>
+    <div class="fact">Your car, your stock, <b>your sales</b></div>
+    <div class="fact">Customers pay <b>in the app</b>: Apple Pay or card</div>
+    <div class="fact">Software free for the <b>trial month</b></div>
+  </div>
+  <div class="tryrow">
+    <a class="try cust" href="customer-app.html"><div class="ti">🛒</div><div><b>Try it as a customer</b><span>Order snacks, watch the car come</span></div><div class="arr">›</div></a>
+    <a class="try drv" href="driver-app.html"><div class="ti">🏁</div><div><b>Try it as the driver</b><span>Pack, drive, see what you keep</span></div><div class="arr">›</div></a>
+  </div>
+  <p class="trynote">Each one opens full screen, like a real app. Or scroll down for the guided walkthrough first.</p>
+</header>
+
+<section class="wrap" id="walk">
+  <div class="kicker">The walkthrough</div>
+  <h2>One order, start to finish</h2>
+  <p class="sub">One order on both phones: the customer's and yours. Step through it, or press play.</p>
+  <div class="walk">
+    <div class="phonecol" id="colC"><div class="plabel"><i></i>Customer's phone</div><div class="phone"><div class="scr c" id="scrC"></div></div></div>
+    <div class="panel" id="panel">
+      <div class="stepnum" id="stepNum"></div>
+      <h3 id="stepTitle"></h3>
+      <div class="txt" id="stepTxt"></div>
+      <div class="who" id="stepWho"></div>
+      <div class="ctrls">
+        <button class="nb play" id="playBtn" onclick="togglePlay()" aria-label="Play">▶</button>
+        <div class="dots" id="dots"></div>
+        <button class="nb back" id="backBtn" onclick="step(-1)">←</button>
+        <button class="nb next" id="nextBtn" onclick="step(1)">Next →</button>
+      </div>
+    </div>
+    <div class="mtabs" id="mtabs"><button data-p="C" onclick="showPhone('C')">Customer's phone</button><button data-p="D" onclick="showPhone('D')">Your phone</button></div>
+    <div class="phonecol" id="colD"><div class="plabel"><i></i>Your phone (driver)</div><div class="phone"><div class="scr d" id="scrD"></div></div></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:8px">
+  <div class="tryband">
+    <div class="kicker">Your turn</div>
+    <h2 style="margin-bottom:4px">Now try it for real</h2>
+    <p class="sub">Same app, full screen on your phone. Tap around as much as you want. Nothing is real and no money moves.</p>
+    <div class="tryrow">
+    <a class="try cust" href="customer-app.html"><div class="ti">🛒</div><div><b>Try it as a customer</b><span>Order snacks, watch the car come</span></div><div class="arr">›</div></a>
+    <a class="try drv" href="driver-app.html"><div class="ti">🏁</div><div><b>Try it as the driver</b><span>Pack, drive, see what you keep</span></div><div class="arr">›</div></a>
+  </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="kicker">Who does what</div>
+  <h2>Three people, three jobs</h2>
+  <div class="cards">
+    <div class="card you"><h4>🏁 You, the driver</h4><ul>
+      <li>🛒<span><b>Buy the stock</b> (Costco or wholesale) and load the car. It's your inventory.</span></li>
+      <li>🚗<span><b>Drive the route</b> each evening and deliver to front doors.</span></li>
+      <li>💵<span><b>Keep the sales.</b> During the trial, 100% of it.</span></li>
+      <li>📣<span><b>Hustle locally:</b> posters, word of mouth, being the friendly face.</span></li>
+    </ul></div>
+    <div class="card oran"><h4>💻 Oran, Stockcar</h4><ul>
+      <li>📱<span><b>Runs the apps:</b> ordering, payments, your driver screen, the area texts.</span></li>
+      <li>🎨<span><b>Brand and car vinyl,</b> plus help with marketing and socials.</span></li>
+      <li>📊<span><b>Tracks the numbers</b> so we both know if it's working.</span></li>
+      <li>🆓<span><b>Free for the trial month.</b> The ongoing deal gets agreed before you start.</span></li>
+    </ul></div>
+    <div class="card cust"><h4>📱 The customer</h4><ul>
+      <li>🧃<span><b>Mostly teens and young people</b> without cars, wanting snacks after school and at night.</span></li>
+      <li>🏠<span>Plus anyone who <b>doesn't want to drive</b> for a pop and chips.</span></li>
+      <li>💳<span><b>Pays up front</b> in the app. You never handle cash.</span></li>
+      <li>💬<span>Opts in to get <b>one text</b> when you're in their area.</span></li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="kicker">Follow the money</div>
+  <h2>That one order, in dollars</h2>
+  <p class="sub">Jordan's order from the walkthrough. What he paid on the left, what ended up in your pocket on the right.</p>
+  <div class="order">
+    <div class="receipt"><h4>🧾 What Jordan paid</h4>
+      <div class="rl"><span>Takis Fuego</span><span>$5.99</span></div>
+      <div class="rl"><span>Coca-Cola × 2</span><span>$6.58</span></div>
+      <div class="rl"><span>KitKat × 2</span><span>$4.98</span></div>
+      <div class="rl"><span>Red Bull</span><span>$4.49</span></div>
+      <div class="rl"><span>Delivery<small>flat $3, free over $25</small></span><span>$3.00</span></div>
+      <div class="rl"><span>Taxes &amp; bottle deposits<small>passed through, not yours</small></span><span id="rTax"></span></div>
+      <div class="rl tt"><span>Total, Apple Pay</span><span id="rTot"></span></div>
+    </div>
+    <div class="keep"><h4>💵 What you keep</h4>
+      <div class="kl p"><span>Snack &amp; drink sales</span><span>+$22.04</span></div>
+      <div class="kl p"><span>Delivery fee</span><span>+$3.00</span></div>
+      <div class="kl m"><span>What that stock cost you<small>paid at Costco/wholesale, ~50% of price</small></span><span>−$11.00</span></div>
+      <div class="kl m"><span>Card fee<small>about 2.9% + 30¢</small></span><span id="kCard"></span></div>
+      <div class="kl m"><span>Gas<small>1.6 km there and back</small></span><span>−$0.58</span></div>
+      <div class="kl n"><span>Stockcar software<small>free during the trial</small></span><span>$0.00</span></div>
+      <div class="kl tt"><span>You keep</span><span id="kNet"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="kicker">What could it earn?</div>
+  <h2>A night, honestly</h2>
+  <p class="sub">The big unknown is how many orders Williams Lake gives you. Pick a scenario, or drag the sliders. These are estimates, not promises. The trial month is how we find out.</p>
+  <div class="calc">
+    <div class="inputs">
+      <div class="presets" id="presets">
+        <button data-p="slow" onclick="preset('slow')">Slow night<small>6 orders</small></button>
+        <button data-p="typ" onclick="preset('typ')" class="on">Typical<small>14 orders</small></button>
+        <button data-p="good" onclick="preset('good')">Good night<small>25 orders</small></button>
+      </div>
+      <div class="rng"><label>Orders per night <b id="vO"></b></label><input type="range" id="iO" min="2" max="40" step="1" oninput="calc()"></div>
+      <div class="rng"><label>Average basket (snacks only) <b id="vB"></b></label><input type="range" id="iB" min="10" max="35" step="1" oninput="calc()"></div>
+      <div class="rng"><label>Hours per night <b id="vH"></b></label><input type="range" id="iH" min="3" max="8" step="1" oninput="calc()"></div>
+      <div class="rng"><label>Nights per week <b id="vN"></b></label><input type="range" id="iN" min="2" max="7" step="1" oninput="calc()"></div>
+      <div class="rng" style="margin-bottom:0"><label>Your markup kept (price − cost) <b id="vM"></b></label><input type="range" id="iM" min="35" max="55" step="1" oninput="calc()"></div>
+    </div>
+    <div class="out">
+      <div class="big3">
+        <div><span>You keep / night</span><b id="oNight"></b></div>
+        <div class="hr"><span>Per hour</span><b id="oHour"></b></div>
+        <div><span>Per week</span><b id="oWeek"></b></div>
+        <div><span>Trial month</span><b id="oMonth"></b></div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <div class="calcbk" id="calcbk"></div>
+      <p class="assume">Assumes about 70% of orders pay the $3 delivery fee (bigger ones get it free), card fees of 2.9% + 30¢, and gas at 18¢/km for 3 km per order plus 25 km of cruising between zones. Doesn't include insurance or wear on your car. Your starting stock isn't a cost here: it turns back into cash as it sells, and anything left at the end is still yours.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="kicker">The deal and the prep</div>
+  <h2>Trial terms and before day one</h2>
+  <div class="terms">
+    <div class="tbox"><h4>📝 Trial month terms</h4>
+      <div class="row">🗓️<span><b>One month,</b> evenings 3–11 PM. You pick which nights.</span></div>
+      <div class="row">💵<span><b>You keep 100%</b> of sales and delivery fees. The software is free.</span></div>
+      <div class="row">🎨<span><b>Oran covers</b> the app, the car vinyl, and marketing help.</span></div>
+      <div class="row">💳<span><b>Card and Apple Pay only,</b> paid in the app before you drive. No cash.</span></div>
+      <div class="row">🤝<span><b>After the trial, if it works:</b> the software is <span class="blank">___%</span> of sales or <span class="blank">$___</span>/month. We fill this in together <b>before</b> day one, so nobody's surprised later.</span></div>
+    </div>
+    <div class="tbox"><h4>✅ Before day one</h4>
+      <ul class="chk" id="chk">
+        <li class="warn"><i></i><span><b>Business licence:</b> call Williams Lake City Hall about a delivery-only business with no storefront.</span></li>
+        <li class="warn"><i></i><span><b>Car insurance for delivery use:</b> call an Autoplan broker. Delivering on a personal-use policy can leave you personally on the hook after a crash.</span></li>
+        <li><i></i><span><b>Powered cooler</b> for drinks, plugged into the car. Pop freezes in a cold car and chocolate melts in a hot one.</span></li>
+        <li><i></i><span><b>Phone mount</b> and car charger.</span></li>
+        <li><i></i><span><b>Starting stock:</b> roughly $500–800 at Costco or a wholesaler, 40–60 products.</span></li>
+        <li><i></i><span><b>Payout account</b> set up so card payments land in your bank.</span></li>
+        <li><i></i><span><b>Tax check</b> with an accountant. Small sellers may not need to charge GST or PST during a short trial.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="kicker">How we'll know</div>
+  <h2>Week-four targets</h2>
+  <p class="sub">Agreed now, so we're not arguing about it later. These are averages over week four, once word has had time to spread.</p>
+  <div class="goals">
+    <div class="goal"><b>12+</b><span>orders per night</span></div>
+    <div class="goal"><b>$15+</b><span>average basket</span></div>
+    <div class="goal"><b>30%+</b><span>customers who order again</span></div>
+    <div class="goal"><b>&gt; min. wage</b><span>what you keep per hour</span></div>
+  </div>
+  <div class="decide"><b>All four:</b> keep going and set the long-term deal. <b>Two or three:</b> look at what's missing (hours, zones, menu) and give it another month. <b>None or one:</b> we stop, no hard feelings, and you've still got whatever stock is left.</div>
+</section>
+
+<footer class="wrap">Stockcar · Williams Lake trial plan · draft for discussion<br>About the apps: <a href="customer.html">customer side</a> · <a href="driver.html">driver side</a></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+/* ---------- phone screens ---------- */
+const C_HEAD=`<div class="sb"><span>7:12</span><span>📶 🔋</span></div><div class="ab"><div class="lg"><img src="logo.png" alt="Stockcar" style="height:15px;width:auto;display:block"></div><small>WESTRIDGE DR</small></div>`;
+const D_HEAD=`<div class="sb"><span>7:12</span><span>📶 🔋</span></div><div class="ab"><div class="lg"><img src="logo-dark.png" alt="Stockcar" style="height:15px;width:auto;display:block"></div><small style="color:var(--green)">● ON SHIFT</small></div>`;
+const cNav=i=>`<div class="navmini">${["🏁","🍫","🛒","📍"].map((e,k)=>`<span class="${k===i?'on':''}">${e}</span>`).join("")}</div>`;
+const dNav=i=>`<div class="navmini">${["🏁","📦","🗺️","💵"].map((e,k)=>`<span class="${k===i?'on':''}">${e}</span>`).join("")}</div>`;
+const C=(body,nav)=>C_HEAD+`<div class="body anim">${body}</div>`+cNav(nav);
+const D=(body,nav)=>D_HEAD+`<div class="body anim">${body}</div>`+dNav(nav);
+
+const cHome=(sms)=>C(`${sms?`<div class="sms"><div class="ic">💬</div><div><b>Stockcar · now</b><p>🏁 Stockcar is in Westridge until 8 PM. Order now and it's at your door in about 10 min.</p></div></div>`:''}
+ <div class="live"><div class="t"><i></i>OUT NOW · UNTIL 11 PM</div><h4>In Westridge right now</h4><p>Parked on Westridge Dr until 8:00, then Downtown.</p>
+ <div class="lsr"><div><b>~9 min</b><span>To your door</span></div><div><b>$3</b><span>Delivery</span></div><div><b>148</b><span>On board</span></div></div></div>
+ <div class="mh">Tonight's route</div>
+ <div class="rt"><div><span>4:30–6:00</span>Glendale</div><div class="now"><span>6:00–8:00</span>Westridge<em>NOW</em></div><div><span>8:00–9:30</span>Downtown</div><div><span>9:30–11:00</span>Fox Mountain</div></div>
+ <div class="mh">Popular tonight</div>
+ <div class="g2"><div class="pc"><div class="e">🌶️</div>Takis Fuego<div class="pr">$5.99<i>+</i></div></div><div class="pc"><div class="e">🥤</div>Coca-Cola<div class="pr">$3.29<i>+</i></div></div></div>`,0);
+
+const cCart=(pulse)=>C(`<div class="mh" style="margin-top:4px">Your order</div>
+ <div class="cl"><span class="e">🌶️</span><b>Takis Fuego</b><span>$5.99</span></div>
+ <div class="cl"><span class="e">🥤</span><b>Coca-Cola × 2</b><span>$6.58</span></div>
+ <div class="cl"><span class="e">🍫</span><b>KitKat × 2</b><span>$4.98</span></div>
+ <div class="cl"><span class="e">🐂</span><b>Red Bull <small style="color:#6D3FD1">16+</small></b><span>$4.49</span></div>
+ <div class="tot"><div><span>Items</span><span>$22.04</span></div><div><span>Delivery</span><span>$3.00</span></div><div><span>Deposit</span><span>$0.30</span></div><div><span>GST / PST</span><span>$2.03</span></div><div class="g"><span>Total</span><span>$27.37</span></div></div>
+ <div style="font-size:9.5px;background:#F1EAFE;border-radius:9px;padding:6px 8px;margin-top:6px">☑ I'm 16 or older (energy drink)</div>
+ <div class="apay ${pulse?'pulse':''}">Apple Pay · $27.37</div>`,2);
+
+const cSheet=()=>C(`<div class="sheet"><div class="big">🏁</div><h4>ORDER IN!</h4><p>Order #1038 is paid.<br>The driver is pulling it off the car now.</p></div>`,3);
+
+const MAP=(x,y)=>`<div class="map"><svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="200" fill="#E9ECE4"/><path d="M0 160 Q90 140 170 158 Q260 176 360 156 L360 200 L0 200 Z" fill="#B7CEE0"/><path d="M-10 130 Q90 100 180 95 Q270 88 370 55" stroke="#fff" stroke-width="9" fill="none"/><path d="M70 0 Q80 50 110 96" stroke="#fff" stroke-width="6" fill="none"/><text x="18" y="42" font-size="9" font-weight="700" fill="#4A5160" font-family="sans-serif">WESTRIDGE</text><path d="M150 96 Q120 78 96 60 Q80 48 64 52" stroke="#E23B2E" stroke-width="3" stroke-dasharray="5 5" fill="none"/><g transform="translate(64 52)"><circle r="8" fill="#2D6CDF" stroke="#fff" stroke-width="3"/><text x="11" y="4" font-size="10" font-weight="800" fill="#1D4ED8" font-family="sans-serif">You</text></g><g transform="translate(${x} ${y})" style="transition:transform 2s linear"><circle r="13" fill="#15171C" stroke="#FFC83D" stroke-width="2.5"/><text y="5" text-anchor="middle" font-size="12">🏎️</text></g></svg></div>`;
+const cTrack=(stage,x,y,eta)=>C(`${MAP(x,y)}<div class="trk"><h5>${["Order received","Driver's packing it","On its way 🏁","Delivered. Enjoy!"][stage]}</h5>
+ ${[["Order received","Paid · sent to the driver"],["Driver accepted","Packing it from the car"],["On the way","Coming from Westridge Dr"],["Delivered","At your front door"]].map((s,i)=>`<div class="st ${i<stage||stage===3?'ok':i===stage?'now':''}"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div>
+ <div class="eta"><span>${stage===3?'Delivered':'Estimated arrival'}</span><b>${eta}</b></div>`,3);
+
+const dRoute=(sent)=>D(`<div style="font-family:var(--display);font-weight:800;font-size:12.5px;margin:2px 2px 7px">Tonight's route</div>
+ <div class="zone past"><div class="zt"><span>4:30–6:00</span><b>Glendale</b></div><div class="zb sent">✓ Area text sent 4:31</div></div>
+ <div class="zone now"><div class="zt"><span>6:00–8:00</span><b>Westridge</b><small style="color:var(--green);font-weight:800;font-size:8px">NOW</small></div>
+  <div class="zb ${sent?'sent':'pulse'}">${sent?'✓ Texted 31 people at 7:12':'💬 Text the 31 people in Westridge'}</div></div>
+ <div class="zone"><div class="zt"><span>8:00–9:30</span><b>Downtown</b></div></div>
+ <div class="zone"><div class="zt"><span>9:30–11:00</span><b>Fox Mountain</b></div></div>
+ <div class="voice" style="margin-top:6px">📦 <b>148 items</b> in the car · cooler at 4°C</div>`,2);
+
+const dIdle=()=>D(`<div class="voice" style="margin-top:2px"><b>Auto-accept is on.</b> New orders go straight to your list and get read out loud.</div>
+ <div class="idle"><div class="e">🏁</div><b style="color:var(--ink)">All caught up.</b><br>Parked in Westridge until 8:00.</div>`,0);
+
+const PACK=[["1×","🌶️ Takis Fuego"],["2×","🥤 Coca-Cola (cooler)"],["2×","🍫 KitKat"],["1×","🐂 Red Bull (16+)"]];
+const dOrder=(ticks)=>D(`<div class="voice" style="margin:0 0 8px">🔊 <b>"New order. 6 items, Westridge Drive."</b></div>
+ <div class="dcard"><div class="h"><b>#1038</b><span>PACK IT</span></div><h4>Jordan</h4><div class="w">📍 48 Westridge Dr · 1.6 km · ~4 min</div>
+ <div class="pk">${PACK.map((p,i)=>`<div class="${i<ticks?'ok':''}"><i>${i<ticks?'✓':''}</i><q>${p[0]}</q><span>${p[1]}</span></div>`).join("")}</div>
+ <div class="dbtn ${ticks>=4?'blue':'off'}">${ticks>=4?'Packed · Start driving →':'Tick each item as you pack it'}</div>
+ <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--soft);margin-top:8px"><span>Paid by Apple Pay</span><span>$27.37</span></div></div>`,0);
+
+const dDrive=()=>`<div class="drive anim"><div class="tg"><i></i>DRIVING MODE</div><h4>Jordan</h4><div class="ad">48 Westridge Dr</div>
+ <div class="dm"><div><b>3 min</b><span>Away</span></div><div><b>1.6 km</b><span>Distance</span></div><div><b>6</b><span>Items</span></div></div>
+ <div class="voice">🔊 <b>Reading out loud:</b> Head to 48 Westridge Drive. About 3 minutes.</div>
+ <div class="sp"></div><div style="font-size:9.5px;color:var(--soft);text-align:center;margin-bottom:8px">Screen locked to big buttons while you're moving</div><div class="here">I'M HERE</div></div>`;
+
+const dHand=(done)=>D(`<div class="dcard" style="border-color:var(--green)"><div class="h"><b>#1038</b><span style="background:rgba(61,220,132,.14);color:var(--green)">${done?'DONE':'AT THE DOOR'}</span></div><h4>Jordan</h4><div class="w">📍 48 Westridge Dr</div>
+ <div class="voice" style="margin:0 0 8px;border-color:rgba(61,220,132,.35)">🚪 <b>Front-door handoff.</b> Already paid, nothing to collect. Red Bull in this one: if he looks under 16, ask.</div>
+ <div class="dbtn green">${done?'✓ Delivered · $25.04 added':'✓ Handed off at the door'}</div></div>
+ ${done?`<div class="voice">💬 Jordan got a text: <b>"Delivered. Thanks for ordering!"</b></div>`:''}`,0);
+
+const dMoney=()=>D(`<div class="net"><span>YOU KEEP TONIGHT · SO FAR</span><b>$83.81</b><p>8 orders · 4.2 hrs · $19.95/hr</p></div>
+ <div class="bk"><div class="p"><span>Snack &amp; drink sales</span><span>+$163.30</span></div><div class="p"><span>Delivery fees</span><span>+$18.00</span></div><div class="m"><span>Stock cost</span><span>−$79.15</span></div><div class="m"><span>Card fees</span><span>−$8.08</span></div><div class="m"><span>Gas (57 km)</span><span>−$10.26</span></div><div class="m"><span>Stockcar software</span><span>−$0.00</span></div><div class="t"><span>You keep</span><span>$83.81</span></div></div>
+ <div class="voice">Next: Downtown at 8:00. <b>3 hours left</b> on shift.</div>`,3);
+
+/* ---------- steps ---------- */
+const STEPS=[
+ {t:"The car is the store",focus:"both",
+  txt:"Before the shift, you load the car: chips, candy, cold drinks in a powered cooler, a few essentials. <b>That's the whole menu.</b> Customers only ever see what's physically in your car, so nothing is ever \"out of stock\" after they've paid.",
+  who:[["y","YOU","Stock the car and post tonight's route: which neighbourhood, which hours."],["c","CUSTOMER","Sees the car is in Westridge right now, and roughly how fast it can get to them."]],
+  c:()=>cHome(false),d:()=>dRoute(false)},
+ {t:"One text to the neighbourhood",focus:"D",
+  txt:"When you arrive in a zone, one tap texts everyone there who opted in. <b>No discounts, no spam,</b> just \"we're here until 8.\" Predictable nights build habits: people learn that Thursday is Stockcar night in Westridge.",
+  who:[["y","YOU","Tap once when you reach the zone. That's your marketing for the hour."],["c","CUSTOMER","Gets one text. Taps it, the app opens."]],
+  c:()=>cHome(true),d:()=>dRoute(true)},
+ {t:"A customer builds an order",focus:"C",
+  txt:"Jordan adds Takis, two Cokes, two KitKats and a Red Bull. <b>Flat $3 delivery,</b> free over $25, $10 minimum. The energy drink asks him to confirm he's 16 or older.",
+  who:[["c","CUSTOMER","Shops your car's live stock and pays with Apple Pay or card."],["y","YOU","Nothing yet. You're parked, maybe finishing the last delivery."]],
+  c:()=>cCart(true),d:()=>dIdle()},
+ {t:"Paid up front, read out loud",focus:"both",
+  txt:"The money's collected before you move. <b>You never handle cash</b> and never get stiffed. The order lands on your phone and gets read out loud, so you don't need to touch the screen if you're driving.",
+  who:[["c","CUSTOMER","Sees \"Order in!\" and can watch the progress."],["y","YOU","Hear: \"New order, 6 items, Westridge Drive.\""]],
+  c:()=>cSheet(),d:()=>dOrder(0)},
+ {t:"Pack it from the car",focus:"D",
+  txt:"Tick each item as you grab it from the bins or cooler. The car's stock count updates automatically, so if that was the last Red Bull, <b>it disappears from everyone's menu</b> right away.",
+  who:[["y","YOU","Pack it in about a minute. Every item's already on board."],["c","CUSTOMER","Sees \"Driver's packing it.\""]],
+  c:()=>cTrack(1,150,96,"4 min"),d:()=>dOrder(4),anim:"pack"},
+ {t:"Driving mode",focus:"both",
+  txt:"Tap <b>Start driving</b> and your phone locks into a big-button screen. Directions open in Maps. In BC, touching your phone while driving is illegal, so the app is built so you don't have to.",
+  who:[["y","YOU","Drive. One giant button when you arrive."],["c","CUSTOMER","Watches the car come down their street on the map."]],
+  c:()=>cTrack(2,100,64,"3 min"),d:()=>dDrive()},
+ {t:"Front-door handoff",focus:"both",
+  txt:"Hand it over at the door. <b>Never go inside.</b> That rule protects you, especially since a lot of customers will be teenagers. Tap Delivered and you're onto the next one.",
+  who:[["y","YOU","Hand off, tap Delivered. About 8 minutes, order to door."],["c","CUSTOMER","Gets a \"Delivered\" text. Has their snacks."]],
+  c:()=>cTrack(3,64,52,"✓"),d:()=>dHand(true)},
+ {t:"What you kept",focus:"D",
+  txt:"The Money tab shows what's really yours: sales and delivery fees, minus what the stock cost you, card fees and gas. <b>No guessing at the end of the night.</b> On this example night, 8 orders in 4 hours.",
+  who:[["y","YOU","See your take-home live, plus how you're tracking against the trial targets."],["o","ORAN","Sees the same numbers, so we decide on facts, not feelings."]],
+  c:()=>cHome(false),d:()=>dMoney()},
+];
+let cur=0, play=null, seen=new Set([0]), mPhone="D";
+function render(){
+  const s=STEPS[cur];
+  $("stepNum").textContent=`STEP ${cur+1} OF ${STEPS.length}`;
+  $("stepTitle").textContent=s.t; $("stepTxt").innerHTML=s.txt;
+  $("stepWho").innerHTML=s.who.map(([k,l,t])=>`<div><span class="tag ${k}">${l}</span><span>${t}</span></div>`).join("");
+  $("scrC").innerHTML=s.c(); $("scrD").innerHTML=s.d();
+  $("colC").classList.toggle("focus",s.focus!=="D"); $("colD").classList.toggle("focus",s.focus!=="C");
+  $("dots").innerHTML=STEPS.map((_,i)=>`<button class="${i===cur?'on':seen.has(i)?'seen':''}" onclick="jump(${i})" aria-label="Step ${i+1}"></button>`).join("");
+  $("backBtn").disabled=cur===0; $("nextBtn").textContent=cur===STEPS.length-1?"Start over ↺":"Next →";
+  if(s.focus!=="both") mPhone=s.focus;
+  showPhone(mPhone,true);
+  if(s.anim==="pack"){ $("scrD").innerHTML=dOrder(0); [1,2,3,4].forEach(n=>setTimeout(()=>{if(cur===4) $("scrD").innerHTML=dOrder(n)},350*n)); }
+}
+function showPhone(p,keep){mPhone=p; $("colC").classList.toggle("show",p==="C"); $("colD").classList.toggle("show",p==="D"); document.querySelectorAll("#mtabs button").forEach(b=>b.classList.toggle("on",b.dataset.p===p))}
+function step(d){ if(cur===STEPS.length-1&&d>0){cur=0}else{cur=Math.max(0,Math.min(STEPS.length-1,cur+d))} seen.add(cur); render() }
+function jump(i){cur=i; seen.add(i); render()}
+function togglePlay(){
+  if(play){clearInterval(play); play=null; $("playBtn").textContent="▶"; return}
+  $("playBtn").textContent="❚❚"; play=setInterval(()=>{ if(cur===STEPS.length-1){togglePlay();return} step(1) },6500);
+}
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight")step(1); if(e.key==="ArrowLeft")step(-1)});
+
+/* ---------- one order money ---------- */
+(function(){
+  const items=22.04, fee=3, tax=2.03, dep=0.30, total=items+fee+tax+dep;
+  const card=total*0.029+0.30, net=items+fee-11.00-card-0.58;
+  $("rTax").textContent="$"+(tax+dep).toFixed(2); $("rTot").textContent="$"+total.toFixed(2);
+  $("kCard").textContent="−$"+card.toFixed(2); $("kNet").textContent="$"+net.toFixed(2);
+})();
+
+/* ---------- calculator ---------- */
+const PRE={slow:{o:6,b:16,h:8,n:5,m:45},typ:{o:14,b:18,h:8,n:5,m:45},good:{o:25,b:20,h:8,n:5,m:45}};
+function preset(k){const p=PRE[k]; $("iO").value=p.o; $("iB").value=p.b; $("iH").value=p.h; $("iN").value=p.n; $("iM").value=p.m;
+  document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",b.dataset.p===k)); calc(true)}
+const m0=n=>"$"+Math.round(n).toLocaleString();
+function calc(fromPreset){
+  if(!fromPreset) document.querySelectorAll("#presets button").forEach(b=>b.classList.remove("on"));
+  const o=+$("iO").value,b=+$("iB").value,h=+$("iH").value,n=+$("iN").value,m=+$("iM").value/100;
+  $("vO").textContent=o; $("vB").textContent="$"+b; $("vH").textContent=h+" hrs"; $("vN").textContent=n; $("vM").textContent=Math.round(m*100)+"%";
+  const sales=o*b, margin=sales*m, fees=o*0.7*3, charged=(sales+fees)*1.08;
+  const card=charged*0.029+o*0.30, km=o*3+25, gas=km*0.18;
+  const net=margin+fees-card-gas, hr=net/h;
+  $("oNight").textContent=m0(net); $("oHour").textContent="$"+hr.toFixed(2); $("oWeek").textContent=m0(net*n); $("oMonth").textContent=m0(net*n*4.3);
+  const v=$("verdict");
+  if(hr<12){v.className="verdict bad"; v.innerHTML="<b>Not worth your time at this level.</b> Either orders pick up, or the hours get trimmed to just the busy stretch."}
+  else if(hr<18){v.className="verdict mid"; v.innerHTML="<b>Under minimum wage.</b> Fine for the first week or two while word spreads, but it has to grow from here."}
+  else if(hr<25){v.className="verdict mid"; v.innerHTML="<b>A decent part-time wage.</b> Worth continuing, and you're your own boss."}
+  else {v.className="verdict good"; v.innerHTML="<b>A real business.</b> Better than most local jobs, on hours you choose."}
+  $("calcbk").innerHTML=`<div><span>Sales (${o} × $${b})</span><span>$${sales.toFixed(0)}</span></div><div><span>Kept after stock cost (${Math.round(m*100)}%)</span><span>$${margin.toFixed(0)}</span></div><div><span>+ Delivery fees</span><span>$${fees.toFixed(0)}</span></div><div><span>− Card fees</span><span>$${card.toFixed(0)}</span></div><div><span>− Gas (${km} km)</span><span>$${gas.toFixed(0)}</span></div>`;
+}
+preset("typ"); render();
+</script>
+</body>
+</html>

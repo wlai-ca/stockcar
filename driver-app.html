@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#121418">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stockcar Driver">
+<title>Stockcar — Driver App Demo</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121418; --panel:#1B1E24; --panel2:#242830; --line:#2F343D;
+  --ink:#EEF0F3; --soft:#8D94A1;
+  --red:#FF4D3D; --flag:#FFC83D; --green:#3DDC84; --blue:#5EA2FF; --violet:#B497FF;
+  --display:"Archivo","Arial Black",sans-serif; --body:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation;font-family:var(--body)}
+body{font-family:var(--body);color:var(--ink);background:#0A0B0D;background-image:radial-gradient(ellipse at 85% 0%,#22252C 0%,#0A0B0D 60%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.stage{display:flex;gap:48px;align-items:center;max-width:1100px;flex-direction:row-reverse}
+.phone{width:400px;max-width:100%;height:820px;max-height:92vh;background:#000;border-radius:44px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 0 0 2px #333;flex-shrink:0}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);position:relative;display:flex;flex-direction:column}
+@media all{
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none;position:fixed;inset:0;width:100%}
+  body{padding:0;display:block;background:var(--bg)}
+  .stage{display:block;max-width:none;width:100%;height:100%}
+  .phone{width:100%;height:100%;height:100dvh;max-height:none;border-radius:0;padding:0;box-shadow:none;background:var(--bg)}
+  .screen{border-radius:0;height:100%}
+  .statusbar{display:none}
+  .appbar{padding-top:calc(12px + env(safe-area-inset-top))}
+  .overlay{border-radius:0}
+}
+.statusbar{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;font-weight:600;color:var(--soft);flex-shrink:0}
+.appbar{padding:6px 18px 10px;flex-shrink:0;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:8px}
+.flagmark{width:22px;height:22px;border-radius:5px;background:conic-gradient(#fff 25%,#121418 0 50%,#fff 0 75%,#121418 0) 0 0/11px 11px;box-shadow:0 0 0 2px #fff}
+.wordmark{font-family:var(--display);font-stretch:125%;font-weight:900;font-style:italic;font-size:20px;line-height:1}
+.wordmark span{color:var(--red)}
+.mode{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:3px}
+.shift{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);padding:7px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--green);cursor:pointer}
+.shift i{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+.shift.off{color:var(--soft)} .shift.off i{background:var(--soft);animation:none}
+@keyframes pulse{50%{opacity:.3}}
+
+.content{flex:1;overflow-y:auto;padding:0 14px 96px;scrollbar-width:none}
+.content::-webkit-scrollbar{display:none}
+.view{display:none}
+.view.active{display:block;animation:up .28s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sect{display:flex;justify-content:space-between;align-items:baseline;margin:18px 2px 10px}
+.sect h3{font-family:var(--display);font-stretch:110%;font-weight:800;font-size:16px}
+.sect span{font-size:11px;color:var(--soft);font-weight:600}
+
+.autobar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:11.5px;color:var(--soft);line-height:1.4}
+.autobar b{color:var(--ink);font-size:12.5px;display:block}
+.switch{width:44px;height:26px;border-radius:99px;background:#3A3F49;position:relative;border:none;cursor:pointer;flex-shrink:0;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.switch.on{background:var(--green)}
+.switch.on::after{left:21px}
+
+/* job card */
+.job{background:var(--panel);border:1.5px solid var(--flag);border-radius:18px;padding:14px;margin-top:12px;box-shadow:0 10px 30px rgba(255,200,61,.08)}
+.jobhead{display:flex;justify-content:space-between;align-items:center}
+.oid{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--flag)}
+.stagepill{font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:4px 9px;border-radius:99px;text-transform:uppercase;background:rgba(255,200,61,.14);color:var(--flag)}
+.job h2{font-family:var(--display);font-stretch:110%;font-weight:800;font-size:20px;margin:8px 0 2px}
+.job .where{font-size:12px;color:var(--soft);margin-bottom:12px}
+.pack{background:var(--panel2);border-radius:12px;padding:4px 0;margin-bottom:12px}
+.pk{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line)}
+.pk:last-child{border-bottom:none}
+.pk .bx{width:20px;height:20px;border-radius:6px;border:2px solid var(--soft);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.pk.ok .bx{background:var(--green);border-color:var(--green);color:#0A0B0D}
+.pk.ok span.t{text-decoration:line-through;color:var(--soft)}
+.pk .q{font-family:var(--mono);font-weight:700;color:var(--flag);min-width:24px}
+.pk .tag{margin-left:auto;font-size:9px;font-weight:800;padding:3px 7px;border-radius:99px}
+.tag.cold{background:rgba(94,162,255,.14);color:var(--blue)}
+.tag.age{background:rgba(180,151,255,.15);color:var(--violet)}
+.agewarn{background:rgba(180,151,255,.1);border:1px solid rgba(180,151,255,.35);color:#DCCFFF;border-radius:12px;padding:9px 11px;font-size:11.5px;line-height:1.45;margin-bottom:12px}
+.bigbtn{width:100%;border:none;border-radius:14px;padding:16px;font-weight:800;font-size:15px;cursor:pointer;background:var(--flag);color:#15171C}
+.bigbtn:disabled{opacity:.35;cursor:not-allowed}
+.bigbtn.go{background:var(--blue);color:#0A1630}
+.bigbtn.done{background:var(--green);color:#06240F}
+.subrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--soft);margin-top:10px;font-family:var(--mono)}
+.idle{text-align:center;padding:30px 16px;color:var(--soft);background:var(--panel);border:1px dashed var(--line);border-radius:18px;margin-top:12px}
+.idle .e{font-size:36px;margin-bottom:8px}
+.idle p{font-size:12.5px;line-height:1.5}
+
+.qrow{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.qrow .qi{flex:1;min-width:0}
+.qrow b{font-size:12.5px;display:block}
+.qrow span{font-size:10.5px;color:var(--soft)}
+.qrow .amt{font-family:var(--mono);font-weight:700;font-size:13px}
+.qbtn{border:none;border-radius:10px;padding:8px 13px;font-weight:800;font-size:12px;cursor:pointer;background:var(--flag);color:#15171C}
+.done-row{opacity:.6}
+.done-row .amt{color:var(--green)}
+
+/* stock */
+.alert{background:rgba(255,77,61,.08);border:1px solid rgba(255,77,61,.35);border-radius:13px;padding:10px 12px;font-size:11.5px;line-height:1.5;color:#FFD3CE;margin-bottom:10px}
+.alert b{color:var(--red)}
+.restock{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:12px}
+.srow{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.srow .se{font-size:20px}
+.srow .sn{flex:1;min-width:0}
+.srow .sn b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .sn span{font-size:10px;color:var(--soft);font-family:var(--mono)}
+.bar{width:70px;height:5px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;border-radius:99px}
+.cnt{font-family:var(--mono);font-weight:700;font-size:15px;min-width:30px;text-align:right}
+.cnt.low{color:var(--red)}
+.legend{font-size:10.5px;color:var(--soft);line-height:1.5;margin:0 2px 10px}
+
+/* route */
+.zone{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:8px}
+.zone.now{border-color:var(--green)}
+.zone.past{opacity:.55}
+.ztop{display:flex;align-items:center;gap:10px}
+.zt{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--flag);min-width:78px}
+.zn{flex:1}
+.zn b{font-size:13px;display:block}
+.zn span{font-size:10.5px;color:var(--soft)}
+.zbtn{margin-top:10px;width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px;font-weight:700;font-size:12px;cursor:pointer}
+.zbtn.sent{color:var(--green);border-color:rgba(61,220,132,.4);cursor:default}
+.preview{background:#F2F2F4;color:#1a1a1a;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.4;margin:10px 0 4px}
+.preview small{display:block;color:#6b6f78;font-size:10px;font-weight:700;margin-bottom:3px;letter-spacing:.06em}
+.rules{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rules div{display:flex;gap:10px;font-size:12px;line-height:1.45;padding:6px 0;color:#C9CED7}
+.rules div b{color:var(--ink)}
+
+/* money */
+.netcard{background:linear-gradient(135deg,#1F232B,#15171C);border:1px solid var(--line);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+.netcard::after{content:"";position:absolute;right:-6px;top:0;bottom:0;width:40px;opacity:.12;background:conic-gradient(#fff 25%,transparent 0 50%,#fff 0 75%,transparent 0) 0 0/14px 14px}
+.netcard span{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--soft);text-transform:uppercase}
+.netcard b{font-family:var(--mono);font-size:34px;color:var(--green);display:block;margin:4px 0}
+.netcard p{font-size:12px;color:#B6BCC7}
+.brk{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.br{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;color:#C9CED7}
+.br span:last-child{font-family:var(--mono)}
+.br.minus span:last-child{color:#FF9B90}
+.br.plus span:last-child{color:var(--green)}
+.br.total{border-top:1px solid var(--line);margin-top:6px;padding-top:9px;font-weight:800;color:var(--ink)}
+.br.total span:last-child{color:var(--green)}
+.br small{display:block;font-size:10px;color:var(--soft);font-weight:500}
+.fineprint{font-size:10.5px;color:var(--soft);line-height:1.5;margin-top:8px;padding:0 2px}
+.week{display:flex;align-items:flex-end;gap:7px;height:96px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.wk i{width:100%;background:var(--panel2);border-radius:5px 5px 2px 2px;min-height:4px}
+.wk.today i{background:var(--flag)}
+.wk span{font-size:9px;color:var(--soft);font-family:var(--mono)}
+.goal{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:7px}
+.goal .gt{display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px}
+.goal .gt b{font-family:var(--mono)}
+.goal .gb{height:6px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.goal .gb i{display:block;height:100%;border-radius:99px}
+
+/* nav */
+.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(18,20,24,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(12px + env(safe-area-inset-bottom));z-index:50}
+.navbtn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;color:var(--soft);cursor:pointer;position:relative}
+.navbtn .ni{font-size:19px;opacity:.5;filter:grayscale(1)}
+.navbtn.on{color:var(--flag)}
+.navbtn.on .ni{opacity:1;filter:none}
+.nbadge{position:absolute;top:-4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:#EEF0F3;color:#15171C;font-size:12.5px;font-weight:700;padding:10px 16px;border-radius:99px;opacity:0;transition:.3s;z-index:90;pointer-events:none;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* driving overlay */
+.overlay{position:absolute;inset:0;background:#0A0B0D;z-index:80;display:none;flex-direction:column;padding:24px 20px calc(24px + env(safe-area-inset-bottom));border-radius:inherit}
+.overlay.show{display:flex;animation:up .25s ease}
+.drvtag{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;margin-top:20px}
+.drvtag i{width:9px;height:9px;border-radius:50%;background:var(--blue);animation:pulse 1.2s infinite}
+.overlay h2{font-family:var(--display);font-stretch:115%;font-weight:900;font-size:30px;line-height:1.05;margin:12px 0 6px}
+.overlay .addrbig{font-size:16px;color:#C9CED7}
+.drvmeta{display:flex;gap:10px;margin:22px 0}
+.dm{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.dm b{font-family:var(--mono);font-size:22px;display:block}
+.dm span{font-size:10.5px;color:var(--soft)}
+.voice{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12.5px;color:#C9CED7;line-height:1.5}
+.voice b{color:var(--ink)}
+.overlay .spacer{flex:1}
+.lock{font-size:11px;color:var(--soft);text-align:center;margin-bottom:12px}
+.arrive{width:100%;height:96px;border:none;border-radius:22px;background:var(--green);color:#06240F;font-family:var(--display);font-stretch:115%;font-weight:900;font-size:24px;cursor:pointer}
+.navlink{width:100%;margin-top:10px;background:none;border:1px solid var(--line);color:var(--ink);border-radius:14px;padding:13px;font-weight:700;font-size:13px;cursor:pointer}
+@media all{.statusbar{display:none}.appbar{padding-top:calc(12px + env(safe-area-inset-top))}}
+
+@media(min-width:521px){body{background:#0A0B0D}.phone{max-width:480px;margin:0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.06)}}
+.logoimg{display:block;height:auto;max-width:100%}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone"><div class="screen">
+    <div class="statusbar"><span>7:12</span><span>📶 🔋</span></div>
+    <div class="appbar">
+      <div class="logo"><div><img class="logoimg" src="logo-dark.png" alt="Stockcar" width="166" height="23"><div class="mode">Driver · Williams Lake</div></div></div>
+      <button class="shift" id="shiftBtn" onclick="toggleShift()"><i></i><span id="shiftTxt">ON SHIFT</span></button>
+    </div>
+
+    <div class="content" id="content">
+      <!-- NOW -->
+      <div class="view active" id="view-now">
+        <div class="autobar">
+          <div style="flex:1"><b>Auto-accept orders</b>New orders go straight into your queue and get read out loud. No tapping while you drive.</div>
+          <button class="switch on" id="autoSw" onclick="toggleAuto()"></button>
+        </div>
+        <div id="jobArea"></div>
+        <div class="sect"><h3>Up next</h3><span id="qCount"></span></div>
+        <div id="queue"></div>
+        <div class="sect"><h3>Delivered tonight</h3><span id="dCount"></span></div>
+        <div id="doneList"></div>
+      </div>
+
+      <!-- STOCK -->
+      <div class="view" id="view-stock">
+        <div class="sect" style="margin-top:6px"><h3>In the car</h3><span id="stockTotal"></span></div>
+        <div class="alert" id="lowAlert"></div>
+        <button class="restock" onclick="restock()">＋ Log a restock run</button>
+        <div class="legend">Each item shows <b style="color:var(--ink)">what you paid → what it sells for</b> and what you keep per unit. Customers only see what's in the car.</div>
+        <div id="stockList"></div>
+      </div>
+
+      <!-- ROUTE -->
+      <div class="view" id="view-route">
+        <div class="sect" style="margin-top:6px"><h3>Tonight's route</h3><span>Customers see this</span></div>
+        <div id="zones"></div>
+        <div class="sect"><h3>House rules</h3></div>
+        <div class="rules">
+          <div>🚪<span><b>Front door only.</b> Hand it over at the door. Never go inside, never give rides.</span></div>
+          <div>🏫<span><b>No parking near schools</b> during school hours. Parents and the school district will notice fast.</span></div>
+          <div>⚡<span><b>Energy drinks are 16+.</b> The customer confirms at checkout. If they look younger, ask.</span></div>
+          <div>📵<span><b>Phone stays mounted while driving.</b> The app reads new orders out loud.</span></div>
+        </div>
+      </div>
+
+      <!-- MONEY -->
+      <div class="view" id="view-money">
+        <div class="netcard" style="margin-top:6px">
+          <span>You keep tonight · so far</span>
+          <b id="netBig">$0</b>
+          <p id="netSub"></p>
+        </div>
+        <div class="brk" id="breakdown"></div>
+        <p class="fineprint">Taxes and bottle deposits customers pay are passed through, not your money. During the trial month, the software is free: you keep 100% of what's shown here.</p>
+        <div class="sect"><h3>Last 7 nights</h3><span>What you kept each night</span></div>
+        <div class="week" id="week"></div>
+        <div class="sect"><h3>Trial targets</h3><span>Week 2 of 4</span></div>
+        <div id="goals"></div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="navbtn on" data-v="now" onclick="go('now')"><span class="ni">🏁</span>Now<span class="nbadge" id="nowBadge" style="display:none"></span></button>
+      <button class="navbtn" data-v="stock" onclick="go('stock')"><span class="ni">📦</span>Stock</button>
+      <button class="navbtn" data-v="route" onclick="go('route')"><span class="ni">🗺️</span>Route</button>
+      <button class="navbtn" data-v="money" onclick="go('money')"><span class="ni">💵</span>Money</button>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <div class="overlay" id="drive">
+      <div class="drvtag"><i></i>Driving mode</div>
+      <h2 id="dName">Jordan</h2>
+      <div class="addrbig" id="dAddr">48 Westridge Dr</div>
+      <div class="drvmeta">
+        <div class="dm"><b id="dEta">4 min</b><span>Away</span></div>
+        <div class="dm"><b id="dKm">1.6 km</b><span>Distance</span></div>
+        <div class="dm"><b id="dItems">5</b><span>Items</span></div>
+      </div>
+      <div class="voice">🔊 <b>Reading out loud:</b> <span id="voiceTxt">Head to 48 Westridge Drive. About 4 minutes.</span></div>
+      <div class="spacer"></div>
+      <div class="lock">Screen locked to big buttons while you're moving</div>
+      <button class="arrive" onclick="arrived()">I'M HERE</button>
+      <button class="navlink" onclick="toast('Opens Google Maps directions')">Open directions in Maps</button>
+    </div>
+  </div></div>
+</div>
+
+<script>
+/* cost = what the operator pays wholesale / at Costco; price = what customers pay */
+const STOCK=[
+ {id:1,e:"🌮",n:"Doritos Nacho Cheese",cost:3.10,price:5.49,q:12,max:16},
+ {id:2,e:"🥔",n:"Old Dutch Ripple",cost:2.95,price:5.29,q:9,max:12},
+ {id:3,e:"🥔",n:"Miss Vickie's S&V",cost:3.20,price:5.49,q:3,max:12},
+ {id:4,e:"🌶️",n:"Takis Fuego",cost:3.40,price:5.99,q:7,max:12},
+ {id:5,e:"🔥",n:"Flamin' Hot Cheetos",cost:3.10,price:5.49,q:6,max:12},
+ {id:6,e:"🍬",n:"Sour Patch Kids",cost:2.40,price:4.49,q:10,max:12},
+ {id:7,e:"🌈",n:"Skittles",cost:1.30,price:2.79,q:14,max:24},
+ {id:10,e:"🍫",n:"KitKat",cost:1.15,price:2.49,q:20,max:24},
+ {id:12,e:"🥜",n:"Reese's PB Cups",cost:1.30,price:2.79,q:12,max:24},
+ {id:13,e:"🥤",n:"Coca-Cola 591 mL",cost:1.45,price:3.29,q:16,max:24,cold:1},
+ {id:15,e:"🍹",n:"Arizona Iced Tea",cost:1.05,price:2.49,q:10,max:12,cold:1},
+ {id:18,e:"⚡",n:"Monster Ultra",cost:2.15,price:4.29,q:4,max:12,cold:1,age:1},
+ {id:19,e:"🐂",n:"Red Bull",cost:2.40,price:4.49,q:9,max:12,cold:1,age:1},
+ {id:23,e:"🫧",n:"Freeze-dried Skittles",cost:4.50,price:7.99,q:3,max:8},
+ {id:24,e:"🔌",n:"USB-C Cable",cost:6.00,price:14.99,q:4,max:6},
+];
+const sk=id=>STOCK.find(s=>s.id==id);
+/* past deliveries tonight: subtotal is item sales; fee = delivery fee charged */
+let done=[
+ {no:1031,name:"Ava",addr:"Downtown",items:{10:2,13:2,7:1},fee:3,t:"3:22"},
+ {no:1032,name:"Liam",addr:"Downtown",items:{4:1,5:1,13:1,18:1},fee:3,t:"3:51"},
+ {no:1033,name:"Noah",addr:"Glendale",items:{1:1,2:1,10:2,12:2,13:2},fee:0,t:"4:40"},
+ {no:1034,name:"Emma",addr:"Glendale",items:{6:1,7:2},fee:3,t:"5:15"},
+ {no:1035,name:"Mason",addr:"Glendale",items:{24:1,13:1},fee:3,t:"5:48"},
+ {no:1036,name:"Olivia",addr:"Westridge",items:{23:1,15:2,10:1},fee:3,t:"6:20"},
+ {no:1037,name:"Ethan",addr:"Westridge",items:{1:2,13:3,12:1,6:1},fee:0,t:"6:51"},
+];
+let current={no:1038,name:"Jordan",addr:"48 Westridge Dr",km:1.6,eta:4,items:{4:1,13:2,10:2,19:1},fee:3,stage:"pack",ticked:{}};
+let queue=[{no:1039,name:"Chloe",addr:"Westridge Pl",km:0.9,eta:3,items:{7:2,15:1,3:1},fee:3}];
+const POOL=[
+ {name:"Ben",addr:"Westridge Cres",km:1.2,eta:4,items:{5:1,13:1,7:1},fee:3},
+ {name:"Maya",addr:"Westridge Dr",km:0.7,eta:2,items:{1:1,4:1,13:2,12:2},fee:3},
+ {name:"Jack",addr:"Lakeview Ave",km:2.1,eta:6,items:{18:2,2:1},fee:3},
+ {name:"Sofia",addr:"Westridge Pl",km:1.0,eta:3,items:{10:3,6:1,15:2},fee:3},
+];
+let nextNo=1040, auto=true, onShift=true, kmDriven=31, shiftStart=15; /* 3:00 PM */
+const $=id=>document.getElementById(id);
+const sub=o=>Object.entries(o.items).reduce((a,[id,q])=>a+sk(id).price*q,0);
+const cogs=o=>Object.entries(o.items).reduce((a,[id,q])=>a+sk(id).cost*q,0);
+const nItems=o=>Object.values(o.items).reduce((a,b)=>a+b,0);
+const money=n=>"$"+n.toFixed(2);
+
+/* ---------- NOW ---------- */
+function renderNow(){
+  const a=$("jobArea");
+  if(!current){a.innerHTML=`<div class="idle"><div class="e">🏁</div><p><b style="color:var(--ink)">All caught up.</b><br>You're parked in Westridge until 8:00. New orders will pop in and be read out loud.</p></div>`}
+  else{
+    const c=current, hasAge=Object.keys(c.items).some(id=>sk(id).age);
+    const allTicked=Object.keys(c.items).every(id=>c.ticked[id]);
+    const label={pack:"Pack it",handoff:"At the door"}[c.stage];
+    let body="";
+    if(c.stage==="pack"){
+      body=`<div class="pack">${Object.entries(c.items).map(([id,q])=>{const s=sk(id);return `<div class="pk ${c.ticked[id]?'ok':''}" onclick="tick(${id})"><div class="bx">${c.ticked[id]?'✓':''}</div><span class="q">${q}×</span><span class="t">${s.e} ${s.n}</span>${s.age?'<span class="tag age">16+</span>':s.cold?'<span class="tag cold">COOLER</span>':''}</div>`}).join("")}</div>
+      ${hasAge?'<div class="agewarn">⚡ This order has an energy drink. The customer confirmed they\'re 16+. If they look younger at the door, it\'s your call to ask.</div>':''}
+      <button class="bigbtn go" ${allTicked?'':'disabled'} onclick="startDrive()">${allTicked?'Packed · Start driving →':'Tick each item as you pack it'}</button>`;
+    }else{
+      body=`<div class="agewarn" style="background:rgba(61,220,132,.08);border-color:rgba(61,220,132,.35);color:#C8F5DA">🚪 Front-door handoff. Already paid. Nothing to collect.${hasAge?' Energy drink in this order: check 16+ if unsure.':''}</div>
+      <button class="bigbtn done" onclick="handoff()">✓ Handed off at the door</button>`;
+    }
+    a.innerHTML=`<div class="job"><div class="jobhead"><span class="oid">#${c.no}</span><span class="stagepill">${label}</span></div>
+      <h2>${c.name}</h2><div class="where">📍 ${c.addr} · ${c.km} km · ~${c.eta} min</div>${body}
+      <div class="subrow"><span>${nItems(c)} items · paid by card</span><span>${money(sub(c)+c.fee)}</span></div></div>`;
+  }
+  $("qCount").textContent=queue.length?queue.length+" waiting":"none";
+  $("queue").innerHTML=queue.length?queue.map(o=>`<div class="qrow"><div class="qi"><b>#${o.no} · ${o.name}</b><span>${o.addr} · ${nItems(o)} items${o.pending?' · <b style="display:inline;color:var(--flag)">needs accepting</b>':''}</span></div><div class="amt">${money(sub(o)+o.fee)}</div>${o.pending?`<button class="qbtn" onclick="accept(${o.no})">Accept</button>`:''}</div>`).join(""):`<div class="qrow" style="justify-content:center;color:var(--soft);font-size:12px">Nothing waiting</div>`;
+  $("dCount").textContent=done.length+" orders";
+  $("doneList").innerHTML=[...done].reverse().map(o=>`<div class="qrow done-row"><div class="qi"><b>#${o.no} · ${o.name}</b><span>${o.t} PM · ${o.addr} · ${nItems(o)} items</span></div><div class="amt">${money(sub(o)+o.fee)}</div></div>`).join("");
+  const pend=queue.filter(o=>o.pending).length+(current&&current.stage==="pack"?1:0);
+  const b=$("nowBadge"); b.style.display=pend?"flex":"none"; b.textContent=pend;
+}
+function tick(id){current.ticked[id]=!current.ticked[id]; renderNow()}
+function accept(no){const o=queue.find(x=>x.no===no); o.pending=false; toast("Accepted"); renderNow()}
+function startDrive(){
+  const c=current; c.stage="drive";
+  $("dName").textContent=c.name; $("dAddr").textContent=c.addr; $("dEta").textContent=c.eta+" min"; $("dKm").textContent=c.km+" km"; $("dItems").textContent=nItems(c);
+  $("voiceTxt").textContent=`Head to ${c.addr}. About ${c.eta} minutes.`;
+  $("drive").classList.add("show");
+  let left=c.eta; clearInterval(window.dT);
+  window.dT=setInterval(()=>{left=Math.max(1,left-1); $("dEta").textContent=left+" min"},2500);
+}
+function arrived(){clearInterval(window.dT); $("drive").classList.remove("show"); current.stage="handoff"; kmDriven+=current.km; renderNow(); toast("Customer texted: \"Your Stockcar is outside\"")}
+function handoff(){
+  const now=new Date();
+  done.push({...current,t:clockLabel()});
+  STOCK.forEach(s=>{if(current.items[s.id]) s.q=Math.max(0,s.q-current.items[s.id])});
+  toast("Delivered ✓ "+money(sub(current)+current.fee)+" added to tonight");
+  const nxt=queue.find(o=>!o.pending);
+  current=nxt?{...nxt,stage:"pack",ticked:{}}:null;
+  if(nxt) queue=queue.filter(o=>o!==nxt);
+  renderAll();
+}
+let clockMin=19*60+12;
+function clockLabel(){const h=Math.floor(clockMin/60)%12||12, m=String(clockMin%60).padStart(2,"0"); return h+":"+m}
+function incoming(){
+  if(!onShift) return;
+  const base=POOL[Math.floor(Math.random()*POOL.length)];
+  const o={...base,items:{...base.items},no:nextNo++,pending:!auto};
+  if(!current&&auto){current={...o,stage:"pack",ticked:{}}}else{queue.push(o)}
+  toast(auto?`🔊 "New order. ${nItems(o)} items, ${o.addr}."`:"🔔 New order: tap Accept");
+  renderNow();
+}
+function startDemo(){ setInterval(incoming,30000)}
+startDemo();
+setInterval(()=>{clockMin+=3},20000);
+
+/* ---------- STOCK ---------- */
+function renderStock(){
+  const low=STOCK.filter(s=>s.q<=4);
+  $("stockTotal").textContent=STOCK.reduce((a,s)=>a+s.q,0)+" units · "+STOCK.length+" products";
+  $("lowAlert").innerHTML=low.length?`⚠️ <b>${low.length} running low:</b> ${low.map(s=>s.n).join(", ")}. Customers see live counts, so these vanish from the menu when they hit zero.`:"✅ Nothing running low.";
+  $("lowAlert").style.background=low.length?"":"rgba(61,220,132,.08)";
+  $("stockList").innerHTML=[...STOCK].sort((a,b)=>a.q-b.q).map(s=>{
+    const pct=Math.min(100,s.q/s.max*100), col=s.q<=4?"var(--red)":pct<50?"var(--flag)":"var(--green)";
+    return `<div class="srow"><div class="se">${s.e}</div><div class="sn"><b>${s.n}</b><span>${money(s.cost)} → ${money(s.price)} · keep ${money(s.price-s.cost)}</span><div class="bar"><i style="width:${pct}%;background:${col}"></i></div></div><div class="cnt ${s.q<=4?'low':''}">${s.q}</div></div>`}).join("");
+}
+let restockSpend=0;
+function restock(){
+  let spent=0; STOCK.forEach(s=>{if(s.q<=s.max/2){const add=s.max-s.q; spent+=add*s.cost; s.q=s.max}});
+  restockSpend+=spent;
+  toast(spent?`Restock logged: ${money(spent)} of stock added`:"Car's already full");
+  renderAll();
+}
+
+/* ---------- ROUTE ---------- */
+const ZONES=[
+ {t:"3:00–4:30",n:"Downtown",d:"After-school run",s:"past",opt:22,sent:"3:02"},
+ {t:"4:30–6:00",n:"Glendale",d:"",s:"past",opt:14,sent:"4:31"},
+ {t:"6:00–8:00",n:"Westridge",d:"Parked on Westridge Dr",s:"now",opt:31,sent:null},
+ {t:"8:00–9:30",n:"Downtown",d:"",s:"",opt:22,sent:null},
+ {t:"9:30–11:00",n:"Fox Mountain",d:"Last call",s:"",opt:9,sent:null},
+];
+function renderZones(){
+  $("zones").innerHTML=ZONES.map((z,i)=>`<div class="zone ${z.s}"><div class="ztop"><div class="zt">${z.t}</div><div class="zn"><b>${z.n}</b><span>${z.d||"&nbsp;"} · ${z.opt} people opted in</span></div>${z.s==='now'?'<span class="stagepill" style="background:rgba(61,220,132,.14);color:var(--green)">NOW</span>':''}</div>
+    ${z.s==='now'?`<div class="preview"><small>THEY'LL GET THIS TEXT</small>🏁 Stockcar is in ${z.n} until ${z.t.split("–")[1]} PM. Order now and it's at your door in about 10 min.</div>`:''}
+    ${z.s==='past'?`<button class="zbtn sent">✓ Area text sent ${z.sent} PM</button>`:z.sent?`<button class="zbtn sent">✓ Sent to ${z.opt} people at ${z.sent} PM</button>`:z.s==='now'?`<button class="zbtn" onclick="sendZone(${i})">💬 Text the ${z.opt} people in ${z.n}</button>`:`<button class="zbtn" style="opacity:.5;cursor:default">Text unlocks when you arrive</button>`}</div>`).join("");
+}
+function sendZone(i){ZONES[i].sent=clockLabel(); toast(`Texted ${ZONES[i].opt} people in ${ZONES[i].n}`); renderZones(); setTimeout(incoming,5000)}
+
+/* ---------- MONEY ---------- */
+function renderMoney(){
+  const sales=done.reduce((a,o)=>a+sub(o),0), fees=done.reduce((a,o)=>a+o.fee,0), cost=done.reduce((a,o)=>a+cogs(o),0);
+  const charged=done.reduce((a,o)=>a+(sub(o)+o.fee)*1.08,0); /* ~tax+deposit on the card charge */
+  const card=charged*0.029+done.length*0.30, gas=kmDriven*0.18;
+  const net=sales+fees-cost-card-gas;
+  const hrs=Math.max(1,(clockMin-shiftStart*60)/60);
+  $("netBig").textContent=money(net);
+  $("netSub").textContent=`${done.length} orders · ${hrs.toFixed(1)} hrs on shift · ${money(net/hrs)}/hr`;
+  $("breakdown").innerHTML=`
+   <div class="br plus"><span>Snack &amp; drink sales<small>${done.length} orders · avg basket ${money(done.length?sales/done.length:0)}</small></span><span>+${money(sales)}</span></div>
+   <div class="br plus"><span>Delivery fees<small>$3 each · free over $25</small></span><span>+${money(fees)}</span></div>
+   <div class="br minus"><span>What the stock cost you<small>Costco / wholesale price</small></span><span>−${money(cost)}</span></div>
+   <div class="br minus"><span>Card fees<small>about 2.9% + 30¢ per order</small></span><span>−${money(card)}</span></div>
+   <div class="br minus"><span>Gas<small>${kmDriven.toFixed(0)} km × 18¢</small></span><span>−${money(gas)}</span></div>
+   <div class="br minus"><span>Stockcar software<small>Free during the trial month</small></span><span>−$0.00</span></div>
+   <div class="br total"><span>You keep</span><span>${money(net)}</span></div>`;
+  const wk=[["Wed",71],["Thu",58],["Fri",126],["Sat",149],["Sun",44],["Mon",52],["Tue",0]];
+  const todayIdx=6; wk[todayIdx][1]=Math.round(net);
+  const mx=Math.max(...wk.map(w=>w[1]),1);
+  $("week").innerHTML=wk.map((w,i)=>`<div class="wk ${i===todayIdx?'today':''}"><i style="height:${Math.max(4,w[1]/mx*70)}px"></i><span>${w[0]}</span><span style="color:var(--ink)">${w[1]?'$'+w[1]:'–'}</span></div>`).join("");
+  const goals=[
+   ["Orders per night","12+",done.length,12,"var(--flag)"],
+   ["Average basket","$15+",sales/Math.max(1,done.length),15,"var(--green)"],
+   ["Repeat customers","30%+",24,30,"var(--blue)"],
+   ["Kept per hour","beat min. wage",net/hrs,18,"var(--violet)"],
+  ];
+  $("goals").innerHTML=goals.map(([l,tg,v,t,c])=>`<div class="goal"><div class="gt"><span>${l} <span style="color:var(--soft)">· target ${tg}</span></span><b style="color:${v>=t?'var(--green)':'var(--ink)'}">${l.includes("basket")||l.includes("hour")?money(v):l.includes("Repeat")?v+"%":v}</b></div><div class="gb"><i style="width:${Math.min(100,v/t*100)}%;background:${c}"></i></div></div>`).join("");
+}
+
+/* ---------- misc ---------- */
+function toggleAuto(){auto=!auto; $("autoSw").classList.toggle("on",auto); toast(auto?"Auto-accept on":"Auto-accept off: you'll tap to accept"); }
+function toggleShift(){onShift=!onShift; $("shiftBtn").classList.toggle("off",!onShift); $("shiftTxt").textContent=onShift?"ON SHIFT":"OFF SHIFT"; toast(onShift?"You're live. Customers can order.":"Off shift. The menu shows 'back tomorrow'.")}
+function go(v){
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  $("view-"+v).classList.add("active");
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  $("content").scrollTop=0; renderAll();
+}
+let tt; function toast(m){const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2400)}
+function renderAll(){renderNow(); renderStock(); renderZones(); renderMoney()}
+renderAll();
+</script>
+</body>
+</html>
