@@ -340,6 +340,7 @@ footer a{color:var(--flag)}
   <h2>One order, start to finish</h2>
   <p class="sub">One order on both phones: the customer's and yours. Step through it, or press play.</p>
   <div class="walk">
+    <div class="mtabs" id="mtabs"><button data-p="C" onclick="showPhone('C')">Customer's phone</button><button data-p="D" onclick="showPhone('D')">Your phone</button></div>
     <div class="phonecol" id="colC"><div class="plabel"><i></i>Customer's phone</div><div class="phone"><div class="scr c" id="scrC"></div></div></div>
     <div class="panel" id="panel">
       <div class="stepnum" id="stepNum"></div>
@@ -353,7 +354,6 @@ footer a{color:var(--flag)}
         <button class="nb next" id="nextBtn" onclick="step(1)">Next →</button>
       </div>
     </div>
-    <div class="mtabs" id="mtabs"><button data-p="C" onclick="showPhone('C')">Customer's phone</button><button data-p="D" onclick="showPhone('D')">Your phone</button></div>
     <div class="phonecol" id="colD"><div class="plabel"><i></i>Your phone (driver)</div><div class="phone"><div class="scr d" id="scrD"></div></div></div>
   </div>
 </section>
