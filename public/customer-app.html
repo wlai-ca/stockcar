@@ -115,7 +115,8 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
 .chip.on{background:var(--asphalt);border-color:var(--asphalt);color:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .prod{background:var(--card);border-radius:16px;padding:12px;box-shadow:var(--shadow);position:relative;display:flex;flex-direction:column}
-.prod .pic{font-size:34px;text-align:center;padding:10px 0 6px}
+.prod .pic{font-size:34px;text-align:center;padding:10px 0 6px;min-height:96px;display:flex;align-items:center;justify-content:center}
+.prod .pic img{width:84px;height:84px;object-fit:contain;display:block}
 .prod .name{font-size:12.5px;font-weight:700;line-height:1.25}
 .prod .size{font-size:10.5px;color:var(--ink-soft);margin:2px 0 8px}
 .prod .row{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
@@ -147,7 +148,8 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
 
 /* cart */
 .line{background:var(--card);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;box-shadow:var(--shadow)}
-.line .li{font-size:22px}
+.line .li{font-size:22px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.line .li img{width:38px;height:38px;object-fit:contain;display:block}
 .line .ln{flex:1;min-width:0}
 .line .ln b{font-size:12.5px;display:block}
 .line .ln span{font-size:10.5px;color:var(--ink-soft)}
@@ -351,32 +353,32 @@ body{font-family:var(--body);color:var(--ink);background:#1B1D22;
 /* tax: z = none, g = GST 5%, gp = GST 5% + BC PST 7%. dep = container deposit */
 const CATS=["All","🍟 Chips","🍬 Candy","🍫 Chocolate","🥤 Drinks","⚡ Energy 16+","🌏 Imported & weird","🔌 Essentials"];
 const P=[
- {id:1,n:"Doritos Nacho Cheese",s:"235 g",p:5.49,e:"🌮",c:"🍟 Chips",st:12,tax:"g"},
- {id:2,n:"Old Dutch Ripple",s:"220 g",p:5.29,e:"🥔",c:"🍟 Chips",st:9,tax:"g"},
- {id:3,n:"Miss Vickie's Sea Salt & Vinegar",s:"200 g",p:5.49,e:"🥔",c:"🍟 Chips",st:3,tax:"g"},
- {id:4,n:"Takis Fuego",s:"280 g",p:5.99,e:"🌶️",c:"🍟 Chips",st:7,tax:"g"},
- {id:5,n:"Flamin' Hot Cheetos",s:"235 g",p:5.49,e:"🔥",c:"🍟 Chips",st:6,tax:"g"},
- {id:6,n:"Sour Patch Kids",s:"185 g",p:4.49,e:"🍬",c:"🍬 Candy",st:10,tax:"g"},
- {id:7,n:"Skittles",s:"61 g",p:2.79,e:"🌈",c:"🍬 Candy",st:14,tax:"g"},
- {id:8,n:"Nerds Gummy Clusters",s:"142 g",p:4.99,e:"🍭",c:"🍬 Candy",st:4,tax:"g"},
- {id:9,n:"Warheads Extreme Sour",s:"57 g",p:2.99,e:"😖",c:"🍬 Candy",st:8,tax:"g"},
- {id:10,n:"KitKat",s:"45 g",p:2.49,e:"🍫",c:"🍫 Chocolate",st:20,tax:"g"},
- {id:11,n:"Coffee Crisp",s:"50 g",p:2.49,e:"🍫",c:"🍫 Chocolate",st:14,tax:"g"},
- {id:12,n:"Reese's Peanut Butter Cups",s:"46 g",p:2.79,e:"🥜",c:"🍫 Chocolate",st:12,tax:"g"},
- {id:13,n:"Coca-Cola",s:"591 mL",p:3.29,e:"🥤",c:"🥤 Drinks",st:16,tax:"gp",dep:.10,cold:1},
- {id:14,n:"Dr Pepper",s:"591 mL",p:3.29,e:"🥤",c:"🥤 Drinks",st:8,tax:"gp",dep:.10,cold:1},
- {id:15,n:"Arizona Iced Tea",s:"680 mL",p:2.49,e:"🍹",c:"🥤 Drinks",st:10,tax:"g",dep:.10,cold:1},
- {id:16,n:"Gatorade Cool Blue",s:"710 mL",p:3.79,e:"💙",c:"🥤 Drinks",st:6,tax:"g",dep:.10,cold:1},
- {id:17,n:"Spring Water",s:"1 L",p:2.49,e:"💧",c:"🥤 Drinks",st:12,tax:"z",dep:.10,cold:1},
- {id:18,n:"Monster Ultra",s:"473 mL",p:4.29,e:"⚡",c:"⚡ Energy 16+",st:4,tax:"gp",dep:.10,cold:1,age:1},
- {id:19,n:"Red Bull",s:"355 mL",p:4.49,e:"🐂",c:"⚡ Energy 16+",st:9,tax:"gp",dep:.10,cold:1,age:1},
- {id:20,n:"Prime Hydration",s:"500 mL",p:4.99,e:"🧃",c:"🌏 Imported & weird",st:5,tax:"g",dep:.10,cold:1},
- {id:21,n:"Matcha KitKat (Japan)",s:"12 minis",p:6.99,e:"🍵",c:"🌏 Imported & weird",st:4,tax:"g"},
- {id:22,n:"Mexican Coke (glass)",s:"355 mL",p:3.99,e:"🍾",c:"🌏 Imported & weird",st:6,tax:"gp",dep:.10,cold:1},
- {id:23,n:"Freeze-dried Skittles",s:"100 g",p:7.99,e:"🫧",c:"🌏 Imported & weird",st:3,tax:"g"},
- {id:24,n:"USB-C Charging Cable",s:"1 m",p:14.99,e:"🔌",c:"🔌 Essentials",st:4,tax:"gp"},
- {id:25,n:"AA Batteries",s:"4-pack",p:7.49,e:"🔋",c:"🔌 Essentials",st:5,tax:"gp"},
- {id:26,n:"Excel Gum Peppermint",s:"12 pcs",p:2.29,e:"🫧",c:"🔌 Essentials",st:10,tax:"g"},
+ {id:1,n:"Doritos Nacho Cheese",s:"235 g",p:5.49,e:"🌮",img:"img/p1.png",c:"🍟 Chips",st:12,tax:"g"},
+ {id:2,n:"Old Dutch Ripple",s:"220 g",p:5.29,e:"🥔",img:"img/p2.png",c:"🍟 Chips",st:9,tax:"g"},
+ {id:3,n:"Miss Vickie's Sea Salt & Vinegar",s:"200 g",p:5.49,e:"🥔",img:"img/p3.png",c:"🍟 Chips",st:3,tax:"g"},
+ {id:4,n:"Takis Fuego",s:"280 g",p:5.99,e:"🌶️",img:"img/p4.png",c:"🍟 Chips",st:7,tax:"g"},
+ {id:5,n:"Flamin' Hot Cheetos",s:"235 g",p:5.49,e:"🔥",img:"img/p5.png",c:"🍟 Chips",st:6,tax:"g"},
+ {id:6,n:"Sour Patch Kids",s:"185 g",p:4.49,e:"🍬",img:"img/p6.png",c:"🍬 Candy",st:10,tax:"g"},
+ {id:7,n:"Skittles",s:"61 g",p:2.79,e:"🌈",img:"img/p7.png",c:"🍬 Candy",st:14,tax:"g"},
+ {id:8,n:"Nerds Gummy Clusters",s:"142 g",p:4.99,e:"🍭",img:"img/p8.png",c:"🍬 Candy",st:4,tax:"g"},
+ {id:9,n:"Warheads Extreme Sour",s:"57 g",p:2.99,e:"😖",img:"img/p9.png",c:"🍬 Candy",st:8,tax:"g"},
+ {id:10,n:"KitKat",s:"45 g",p:2.49,e:"🍫",img:"img/p10.png",c:"🍫 Chocolate",st:20,tax:"g"},
+ {id:11,n:"Coffee Crisp",s:"50 g",p:2.49,e:"🍫",img:"img/p11.png",c:"🍫 Chocolate",st:14,tax:"g"},
+ {id:12,n:"Reese's Peanut Butter Cups",s:"46 g",p:2.79,e:"🥜",img:"img/p12.png",c:"🍫 Chocolate",st:12,tax:"g"},
+ {id:13,n:"Coca-Cola",s:"591 mL",p:3.29,e:"🥤",img:"img/p13.png",c:"🥤 Drinks",st:16,tax:"gp",dep:.10,cold:1},
+ {id:14,n:"Dr Pepper",s:"591 mL",p:3.29,e:"🥤",img:"img/p14.png",c:"🥤 Drinks",st:8,tax:"gp",dep:.10,cold:1},
+ {id:15,n:"Arizona Iced Tea",s:"680 mL",p:2.49,e:"🍹",img:"img/p15.png",c:"🥤 Drinks",st:10,tax:"g",dep:.10,cold:1},
+ {id:16,n:"Gatorade Cool Blue",s:"710 mL",p:3.79,e:"💙",img:"img/p16.png",c:"🥤 Drinks",st:6,tax:"g",dep:.10,cold:1},
+ {id:17,n:"Spring Water",s:"1 L",p:2.49,e:"💧",img:"img/p17.png",c:"🥤 Drinks",st:12,tax:"z",dep:.10,cold:1},
+ {id:18,n:"Monster Ultra",s:"473 mL",p:4.29,e:"⚡",img:"img/p18.png",c:"⚡ Energy 16+",st:4,tax:"gp",dep:.10,cold:1,age:1},
+ {id:19,n:"Red Bull",s:"355 mL",p:4.49,e:"🐂",img:"img/p19.png",c:"⚡ Energy 16+",st:9,tax:"gp",dep:.10,cold:1,age:1},
+ {id:20,n:"Prime Hydration",s:"500 mL",p:4.99,e:"🧃",img:"img/p20.png",c:"🌏 Imported & weird",st:5,tax:"g",dep:.10,cold:1},
+ {id:21,n:"Matcha KitKat (Japan)",s:"12 minis",p:6.99,e:"🍵",img:"img/p21.png",c:"🌏 Imported & weird",st:4,tax:"g"},
+ {id:22,n:"Mexican Coke (glass)",s:"355 mL",p:3.99,e:"🍾",img:"img/p22.png",c:"🌏 Imported & weird",st:6,tax:"gp",dep:.10,cold:1},
+ {id:23,n:"Freeze-dried Skittles",s:"100 g",p:7.99,e:"🫧",img:"img/p23.png",c:"🌏 Imported & weird",st:3,tax:"g"},
+ {id:24,n:"USB-C Charging Cable",s:"1 m",p:14.99,e:"🔌",img:"img/p24.png",c:"🔌 Essentials",st:4,tax:"gp"},
+ {id:25,n:"AA Batteries",s:"4-pack",p:7.49,e:"🔋",img:"img/p25.png",c:"🔌 Essentials",st:5,tax:"gp"},
+ {id:26,n:"Excel Gum Peppermint",s:"12 pcs",p:2.29,e:"🫧",img:"img/p26.png",c:"🔌 Essentials",st:10,tax:"g"},
 ];
 const COMBOS={
   movie:{n:"Movie Night combo",e:"🍿",p:19.99,items:{1:1,2:1,10:1,12:1,13:2}},
@@ -394,6 +396,7 @@ const AREAS=["Glendale","Fox Mountain","Downtown","Lakeview","Westridge"];
 let tick=0;
 let cart={}, combos=[], cat="All", optIn=true, orderNo=1001, live=null;
 const byId=id=>P.find(x=>x.id==id);
+const pimg=p=>p.img?`<img src="${p.img}" alt="" loading="lazy">`:p.e;
 const $=id=>document.getElementById(id);
 
 function yourEta(){
@@ -435,7 +438,7 @@ setInterval(routeTick,15000);
 function card(p){
   const q=cart[p.id]||0;
   const badges=(p.age?'<span class="badge b-age">16+</span>':p.cold?'<span class="badge b-cold">❄ COLD</span>':'')+(p.st<=4?`<span class="badge b-low">${p.st} left</span>`:'');
-  return `<div class="prod">${badges}<div class="pic">${p.e}</div><div class="name">${p.n}</div><div class="size">${p.s}</div>
+  return `<div class="prod">${badges}<div class="pic">${pimg(p)}</div><div class="name">${p.n}</div><div class="size">${p.s}</div>
   <div class="row"><div class="price">$${p.p.toFixed(2)}</div>${q?`<div class="qty"><button onclick="sub(${p.id})">−</button><span>${q}</span><button onclick="add(${p.id})">+</button></div>`:`<button class="add" onclick="add(${p.id})" aria-label="Add ${p.n}">+</button>`}</div>
   <div class="stockline ${p.st<=4?'low':''}">${p.st-q<=0?'All of them are in your cart':(p.st-q)+' in the car'}</div></div>`;
 }
@@ -472,7 +475,7 @@ function renderCart(){
   if(!n){$("cartList").innerHTML="";$("cartFull").style.display="none";$("cartEmpty").style.display="block";return}
   $("cartEmpty").style.display="none";$("cartFull").style.display="block";
   $("cartList").innerHTML=combos.map((k,i)=>{const c=COMBOS[k];return `<div class="line"><div class="li">${c.e}</div><div class="ln"><b>${c.n}</b><span>Combo deal</span></div><div class="lp">$${c.p.toFixed(2)}</div><button class="qty" style="border:none;background:none;cursor:pointer;font-size:15px" onclick="rmCombo(${i})" aria-label="Remove">✕</button></div>`}).join("")+
-    lines().map(({p,q})=>`<div class="line"><div class="li">${p.e}</div><div class="ln"><b>${p.n}</b><span>${p.s}${p.cold?' · cold from the cooler':''}</span></div><div class="qty"><button onclick="sub(${p.id})">−</button><span>${q}</span><button onclick="add(${p.id})">+</button></div><div class="lp">$${(p.p*q).toFixed(2)}</div></div>`).join("");
+    lines().map(({p,q})=>`<div class="line"><div class="li">${pimg(p)}</div><div class="ln"><b>${p.n}</b><span>${p.s}${p.cold?' · cold from the cooler':''}</span></div><div class="qty"><button onclick="sub(${p.id})">−</button><span>${q}</span><button onclick="add(${p.id})">+</button></div><div class="lp">$${(p.p*q).toFixed(2)}</div></div>`).join("");
   const t=totals();
   $("totals").innerHTML=`<div class="trow"><span>Items</span><span>$${t.sub.toFixed(2)}</span></div>
    ${t.del?`<div class="trow"><span>Delivery (flat)</span><span>$3.00</span></div>`:`<div class="trow free"><span>Delivery: free over $25</span><span>$0.00</span></div>`}
